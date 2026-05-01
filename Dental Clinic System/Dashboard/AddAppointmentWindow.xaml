@@ -1,0 +1,156 @@
+﻿<Window x:Class="Dental_Clinic_System.Dashboard.AddAppointmentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="New Appointment" Height="480" Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="White"
+        WindowStyle="None"
+        AllowsTransparency="True">
+
+    <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="10">
+        <Grid Margin="25">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="Auto"/>
+                <!-- Form -->
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="New Appointment" FontSize="20" FontWeight="Bold" Foreground="#333"/>
+                    <TextBlock Text="Fill in the details below" FontSize="12" Foreground="#888" Margin="0,3,0,0"/>
+                </StackPanel>
+                <!-- Close Button -->
+                <Button Grid.Column="1" Content="✕" Width="28" Height="28" 
+                        Background="Transparent" BorderThickness="0" 
+                        FontSize="14" Foreground="#888" Cursor="Hand"
+                        Click="CloseButton_Click"/>
+            </Grid>
+
+            <!-- FORM -->
+            <StackPanel Grid.Row="1">
+
+                <!-- Patient Name -->
+                <TextBlock Text="Patient Name" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                <TextBox x:Name="PatientNameBox" Height="34" Padding="10,0" 
+                         Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                         VerticalContentAlignment="Center"
+                         Text="Enter patient name" Foreground="Gray"
+                         GotFocus="PatientNameBox_GotFocus" LostFocus="PatientNameBox_LostFocus"/>
+
+                <Border Height="8"/>
+
+                <!-- Date & Time Row -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Date" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                        <DatePicker x:Name="DateBox" Height="34" Padding="10,0"
+                                    Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                                    VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Time" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="TimeBox" Height="34" Padding="10,0"
+                                  Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                                  VerticalContentAlignment="Center" SelectedIndex="0">
+                            <ComboBoxItem Content="08:00 AM"/>
+                            <ComboBoxItem Content="09:00 AM"/>
+                            <ComboBoxItem Content="10:00 AM"/>
+                            <ComboBoxItem Content="11:00 AM"/>
+                            <ComboBoxItem Content="01:00 PM"/>
+                            <ComboBoxItem Content="02:00 PM"/>
+                            <ComboBoxItem Content="03:00 PM"/>
+                            <ComboBoxItem Content="04:00 PM"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <Border Height="8"/>
+
+                <!-- Service & Dentist Row -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Service" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="ServiceBox" Height="34" Padding="10,0"
+                                  Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                                  VerticalContentAlignment="Center" SelectedIndex="0">
+                            <ComboBoxItem Content="Teeth Cleaning"/>
+                            <ComboBoxItem Content="Root Canal"/>
+                            <ComboBoxItem Content="Tooth Extraction"/>
+                            <ComboBoxItem Content="Dental Crown"/>
+                            <ComboBoxItem Content="Braces Adjustment"/>
+                            <ComboBoxItem Content="Teeth Whitening"/>
+                            <ComboBoxItem Content="Dental Checkup"/>
+                            <ComboBoxItem Content="Cavity Filling"/>
+                            <ComboBoxItem Content="Wisdom Tooth Removal"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Dentist" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="DentistBox" Height="34" Padding="10,0"
+                                  Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                                  VerticalContentAlignment="Center" SelectedIndex="0">
+                            <ComboBoxItem Content="Dr. Santos"/>
+                            <ComboBoxItem Content="Dr. Reyes"/>
+                            <ComboBoxItem Content="Dr. Cruz"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <Border Height="8"/>
+
+                <!-- Status -->
+                <TextBlock Text="Status" FontSize="12" Foreground="#555" Margin="0,0,0,4"/>
+                <ComboBox x:Name="StatusBox" Height="34" Padding="10,0"
+                          Background="#F5F5F5" BorderThickness="0" FontSize="13"
+                          VerticalContentAlignment="Center" SelectedIndex="0">
+                    <ComboBoxItem Content="Confirmed"/>
+                    <ComboBoxItem Content="Pending"/>
+                    <ComboBoxItem Content="Cancelled"/>
+                </ComboBox>
+
+            </StackPanel>
+
+            <!-- BUTTONS -->
+            <Grid Grid.Row="3" Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Cancel" Height="38" 
+                        Background="#F5F5F5" Foreground="#555" BorderThickness="0"
+                        FontSize="13" Cursor="Hand" Click="CancelButton_Click"/>
+
+                <Button Grid.Column="2" Content="Save Appointment" Height="38" 
+                        Background="#006B6B" Foreground="White" BorderThickness="0"
+                        FontSize="13" FontWeight="Medium" Cursor="Hand" Click="SaveButton_Click"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

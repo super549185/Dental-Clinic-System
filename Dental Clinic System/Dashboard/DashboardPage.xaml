@@ -1,0 +1,142 @@
+﻿<Page x:Class="Dental_Clinic_System.Dashboard.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#F9FAFB">
+
+    <Grid Margin="30,25,30,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Stats -->
+            <RowDefinition Height="*"/>
+            <!-- Table -->
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,25">
+            <TextBlock Text="Dashboard" FontSize="26" FontWeight="Bold" Foreground="#111827"/>
+            <TextBlock Text="Overview of today's clinic activity" FontSize="13" Foreground="#9CA3AF" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- STAT CARDS -->
+        <Grid Grid.Row="1" Margin="0,0,0,25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Appointments Today -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Total Appointments Today" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="StatAppointments" Grid.Row="1" Text="0" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="2" FontSize="11" Foreground="#10B981" Margin="0,5,0,0">
+                        <Run Text="↑ 12% "/><Run Text="from yesterday" Foreground="#9CA3AF"/>
+                    </TextBlock>
+                </Grid>
+            </Border>
+
+            <!-- Card 2: Total Patients -->
+            <Border Grid.Column="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Total Patients" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="StatPatients" Grid.Row="1" Text="1,284" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="2" FontSize="11" Foreground="#10B981" Margin="0,5,0,0">
+                        <Run Text="↑ 8% "/><Run Text="from last month" Foreground="#9CA3AF"/>
+                    </TextBlock>
+                </Grid>
+            </Border>
+
+            <!-- Card 3: Dentists On Duty -->
+            <Border Grid.Column="4" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Dentists On Duty" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Grid.Row="1" Text="3 / 4" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="2" FontSize="11" Foreground="#6B7280" Margin="0,5,0,0">
+                        <Run Text="1 on leave"/>
+                    </TextBlock>
+                </Grid>
+            </Border>
+
+            <!-- Card 4: Income Today -->
+            <Border Grid.Column="6" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Income Today" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Grid.Row="1" Text="$4,850" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="2" FontSize="11" Foreground="#10B981" Margin="0,5,0,0">
+                        <Run Text="↑ 15% "/><Run Text="from yesterday" Foreground="#9CA3AF"/>
+                    </TextBlock>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- APPOINTMENTS TODAY TABLE -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Table Header -->
+                <Border Grid.Row="0" Background="#F9FAFB" CornerRadius="10,10,0,0" Padding="25,15" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                    <TextBlock Text="Appointments Today" FontSize="16" FontWeight="SemiBold" Foreground="#111827"/>
+                </Border>
+
+                <!-- Column Headers -->
+                <Border Grid.Row="1" Background="White" Height="40" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Margin="25,0,25,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="110"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="PATIENT NAME" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="TIME" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="DENTIST" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="SERVICE" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="STATUS" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Data Rows -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,40,0,10">
+                    <StackPanel x:Name="TodayAppointmentsList"/>
+                </ScrollViewer>
+
+                <!-- Empty State -->
+                <TextBlock x:Name="EmptyState" Grid.Row="1" Text="No appointments scheduled for today." 
+                           FontSize="14" Foreground="#9CA3AF" HorizontalAlignment="Center" 
+                           VerticalAlignment="Center" Visibility="Collapsed" Margin="0,40,0,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

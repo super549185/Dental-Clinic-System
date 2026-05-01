@@ -95,7 +95,7 @@
                 </ListBox>
 
                 <!-- Logout Section (Compact) -->
-                <Button Grid.Row="2" 
+                <Button x:Name="logoutButton" Grid.Row="2" 
                         Content="Logout" 
                         Background="Transparent" 
                         Foreground="#EF9A9A"
@@ -105,7 +105,7 @@
                         Cursor="Hand"
                         FontWeight="Medium"
                         Height="36"
-                        Margin="0,0,0,10">
+                        Margin="0,0,0,10" Click="logoutButton_Click">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Template">
