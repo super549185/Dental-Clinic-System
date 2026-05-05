@@ -42,6 +42,21 @@ namespace Dental_Clinic_System.Dashboard
                     aptFrame.Navigate(new AppointmentPage());
                     contentGrid.Children.Add(aptFrame);
                     break;
+                case "Patients":
+                    Frame patFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
+                    patFrame.Navigate(new PatientPage());
+                    contentGrid.Children.Add(patFrame);
+                    break;
+                case "Services":
+                    Frame servFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
+                    servFrame.Navigate(new ServicePage());
+                    contentGrid.Children.Add(servFrame);
+                    break;
+                case "Inventory":
+                    Frame invFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
+                    invFrame.Navigate(new InventoryPage());
+                    contentGrid.Children.Add(invFrame);
+                    break;
 
                 default:
                     TextBlock comingSoon = new TextBlock

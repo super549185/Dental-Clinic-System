@@ -81,15 +81,15 @@
 
                 <!-- TABLE HEADER -->
                 <Border Grid.Row="1" Background="#F9FAFB" Height="45" BorderBrush="#E5E7EB" BorderThickness="0,1,0,1">
-                    <Grid Margin="24,0">
+                    <Grid Margin="15,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="85"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="190"/>
+                            <ColumnDefinition Width="95"/>
                             <ColumnDefinition Width="110"/>
-                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="60"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="APPOINTMENT ID" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="PATIENT NAME" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>

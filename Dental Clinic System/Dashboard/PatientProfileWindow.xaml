@@ -1,0 +1,192 @@
+﻿<Window x:Class="Dental_Clinic_System.Dashboard.PatientProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Patient Profile" Height="650" Width="900"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="#F3F4F6" WindowStyle="None" AllowsTransparency="True">
+
+    <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Background="#F3F4F6">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <Grid Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock x:Name="ProfileTitle" Text="Patient Profile" FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Detailed patient information and history" FontSize="12" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="EditBtn" Content="&#xE70F;  Edit Profile" Background="#006B6B" Foreground="White" BorderThickness="0" Padding="12,8" FontSize="13" FontWeight="Medium" Cursor="Hand" Margin="0,0,10,0" Click="EditBtn_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="White"/>
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#008080"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button Content="Back to Patients" Height="34" Background="White" Foreground="#6B7280" BorderThickness="1" BorderBrush="#E5E7EB" FontSize="13" FontWeight="Medium" Cursor="Hand" Padding="10,0" Click="Close_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{TemplateBinding Foreground}"/>
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F3F4F6"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- CONTENT GRID (2 Columns) -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- LEFT COLUMN -->
+                <StackPanel>
+                    <!-- Basic Info Card -->
+                    <Border Background="White" CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Basic Information" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Full Name" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtName" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Date of Birth" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtDOB" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Phone" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtPhone" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Email" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtEmail" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Address" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtAddress" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Medical Info Card -->
+                    <Border Background="White" CornerRadius="8" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="Medical Information" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Allergies" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <Border Grid.Column="1" Background="#FEE2E2" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                    <TextBlock x:Name="TxtAllergies" Text="-" FontSize="12" FontWeight="Medium" Foreground="#991B1B"/>
+                                </Border>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Conditions" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtConditions" Grid.Column="1" Text="-" FontSize="13" FontWeight="Medium" Foreground="#111827" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Blood Type" FontSize="13" Foreground="#6B7280" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="TxtBlood" Grid.Column="1" Text="-" FontSize="13" FontWeight="Bold" Foreground="#EF4444" VerticalAlignment="Top"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- RIGHT COLUMN -->
+                <StackPanel Grid.Column="2">
+                    <!-- Upcoming Appointment Card -->
+                    <Border Background="White" CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Upcoming Appointment" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <StackPanel x:Name="UpcomingPanel">
+                                <TextBlock Text="No upcoming appointments." FontSize="13" Foreground="#9CA3AF"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Dental History Card -->
+                    <Border Background="White" CornerRadius="8" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="Dental History" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+
+                            <Border Background="#F9FAFB" Height="35" CornerRadius="4" Margin="0,0,0,5">
+                                <Grid Margin="10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Date" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Treatment" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="Dentist" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="HistoryPanel"/>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

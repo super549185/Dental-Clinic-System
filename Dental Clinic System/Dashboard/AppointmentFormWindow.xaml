@@ -57,14 +57,7 @@
                 <TextBlock Text="SERVICE" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
                 <ComboBox x:Name="ServiceBox" Height="38" Padding="10,0" 
                           Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" 
-                          FontSize="13" VerticalContentAlignment="Center" SelectedIndex="0">
-                    <ComboBoxItem Content="Cleaning"/>
-                    <ComboBoxItem Content="Root Canal"/>
-                    <ComboBoxItem Content="Tooth Extraction"/>
-                    <ComboBoxItem Content="Braces Adjustment"/>
-                    <ComboBoxItem Content="Teeth Whitening"/>
-                    <ComboBoxItem Content="Dental Checkup"/>
-                </ComboBox>
+                          FontSize="13" VerticalContentAlignment="Center"/>
 
                 <Border Height="15"/>
 

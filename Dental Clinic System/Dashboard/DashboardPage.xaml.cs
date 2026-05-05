@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +16,7 @@ namespace Dental_Clinic_System.Dashboard
         {
             InitializeComponent();
             _dbContext = new AppDbContext();
+            _dbContext.Database.EnsureCreated();
             LoadTodayData();
         }
 
@@ -24,18 +24,14 @@ namespace Dental_Clinic_System.Dashboard
         {
             _dbContext.Database.EnsureCreated();
 
-            // Get today's date in the format saved in DB (yyyy-MM-dd)
             string todayStr = DateTime.Today.ToString("yyyy-MM-dd");
 
-            // Query database for today's appointments
             var todayApts = _dbContext.Appointments
                 .Where(a => a.Date == todayStr)
                 .ToList();
 
-            // Update Stat Card
             StatAppointments.Text = todayApts.Count.ToString();
 
-            // Load Table
             TodayAppointmentsList.Children.Clear();
 
             if (todayApts.Count == 0)
@@ -56,6 +52,7 @@ namespace Dental_Clinic_System.Dashboard
 
         private Border CreateTableRow(AppointmentItem apt, int index)
         {
+            // Margin matches the header (25 left/right)
             Border row = new Border
             {
                 Height = 55,
@@ -66,20 +63,20 @@ namespace Dental_Clinic_System.Dashboard
             };
 
             Grid grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
 
-            // Cells
+            // WIDTHS MUST EXACTLY MATCH THE XAML COLUMN DEFINITIONS
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Patient Name
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120, GridUnitType.Pixel) }); // Time
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120, GridUnitType.Pixel) }); // Dentist
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140, GridUnitType.Pixel) }); // Service
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) }); // Status
+
             grid.Children.Add(CreateCell(apt.PatientName, "#111827", FontWeights.Medium, 0));
             grid.Children.Add(CreateCell(apt.Time, "#4B5563", FontWeights.Normal, 1));
             grid.Children.Add(CreateCell(apt.Dentist, "#4B5563", FontWeights.Normal, 2));
             grid.Children.Add(CreateCell(apt.Service, "#4B5563", FontWeights.Normal, 3));
 
-            // Status Badge (Added "In Progress" style just in case)
-            grid.Children.Add(CreateDashboardStatusBadge(apt.Status, 4));
+            grid.Children.Add(CreateStatusBadge(apt.Status, 4));
 
             row.Child = grid;
             return row;
@@ -99,20 +96,20 @@ namespace Dental_Clinic_System.Dashboard
             return tb;
         }
 
-        private Border CreateDashboardStatusBadge(string status, int col)
+        private Border CreateStatusBadge(string status, int col)
         {
             SolidColorBrush bg = Brushes.White;
             SolidColorBrush fg = Brushes.Black;
 
             if (status == "Confirmed")
             {
-                bg = new SolidColorBrush(Color.FromRgb(0xD1, 0xFA, 0xE5)); // Light Green
-                fg = new SolidColorBrush(Color.FromRgb(0x06, 0x5F, 0x46)); // Dark Green
+                bg = new SolidColorBrush(Color.FromRgb(0xD1, 0xFA, 0xE5));
+                fg = new SolidColorBrush(Color.FromRgb(0x06, 0x5F, 0x46));
             }
             else if (status == "Cancelled")
             {
-                bg = new SolidColorBrush(Color.FromRgb(0xFE, 0xE2, 0xE2)); // Light Red
-                fg = new SolidColorBrush(Color.FromRgb(0x99, 0x1B, 0x1B)); // Dark Red
+                bg = new SolidColorBrush(Color.FromRgb(0xFE, 0xE2, 0xE2));
+                fg = new SolidColorBrush(Color.FromRgb(0x99, 0x1B, 0x1B));
             }
 
             Border badge = new Border

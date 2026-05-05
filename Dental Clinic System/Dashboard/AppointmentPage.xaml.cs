@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Dental_Clinic_System.Data;
 using Dental_Clinic_System.Models;
+using System.Windows.Media.Imaging;
 
 namespace Dental_Clinic_System.Dashboard
 {
@@ -88,6 +89,13 @@ namespace Dental_Clinic_System.Dashboard
         // ================= LOAD DATA =================
         private void LoadAppointments()
         {
+            // CRITICAL: Destroy old context to clear EF Core's memory cache
+            _dbContext.Dispose();
+
+            // Create a brand new context so it is forced to read from the actual database
+            _dbContext = new AppDbContext();
+            _dbContext.Database.EnsureCreated();
+
             AppointmentList.Children.Clear();
             var appointments = _dbContext.Appointments.ToList();
 
@@ -130,18 +138,17 @@ namespace Dental_Clinic_System.Dashboard
                 Background = index % 2 == 0 ? Brushes.White : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0xF4, 0xF6)),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                Padding = new Thickness(24, 0, 24, 0)
+                Padding = new Thickness(15, 0, 15, 0)
             };
 
             Grid grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80, GridUnitType.Pixel) });
-
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60, GridUnitType.Pixel) });
             grid.Children.Add(CreateCell(apt.AppointmentId, "#6B7280", FontWeights.Medium, 0));
             grid.Children.Add(CreateCell(apt.PatientName, "#111827", FontWeights.SemiBold, 1));
             grid.Children.Add(CreateCell(apt.Dentist, "#4B5563", FontWeights.Normal, 2));
@@ -152,8 +159,8 @@ namespace Dental_Clinic_System.Dashboard
             grid.Children.Add(CreateStatusBadge(apt.Status, 5));
 
             StackPanel actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
-            actions.Children.Add(CreateIconButton("&#xE70F;", "#6B7280", apt)); // Edit
-            actions.Children.Add(CreateIconButton("&#xE74D;", "#EF4444", apt)); // Delete
+            actions.Children.Add(CreateImageButton("Images/edit.png", apt, false));
+            actions.Children.Add(CreateImageButton("Images/delete.png", apt, true));
             Grid.SetColumn(actions, 6);
             grid.Children.Add(actions);
 
@@ -161,16 +168,65 @@ namespace Dental_Clinic_System.Dashboard
             return row;
         }
 
-        private Button CreateIconButton(string iconGlyph, string hexColor, AppointmentItem apt)
+        private Button CreateImageButton(string imagePath, AppointmentItem apt, bool isDelete)
         {
-            TextBlock icon = new TextBlock { Text = iconGlyph, FontFamily = new FontFamily("Segoe MDL2 Assets"), FontSize = 14, Foreground = GetColorFromHex(hexColor), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-            Button btn = new Button { Content = icon, Background = Brushes.Transparent, BorderThickness = new Thickness(0), Cursor = Cursors.Hand, Width = 32, Height = 32, Padding = new Thickness(0), Margin = new Thickness(2, 0, 2, 0) };
+            // Create the image element
+            Image img = new Image
+            {
+                Width = 18,
+                Height = 18,
+                Stretch = Stretch.UniformToFill
+            };
 
-            if (hexColor == "#6B7280") btn.Click += (s, e) => EditAppointment_Click(apt);
-            else btn.Click += (s, e) => RemoveAppointment_Click(apt);
+            // Load the image from the project resources
+            try
+            {
+                img.Source = new BitmapImage(new Uri($"pack://application:,,,/{imagePath}", UriKind.Absolute));
+            }
+            catch
+            {
+                // Fallback text if image fails to load
+                var fallbackText = new TextBlock { Text = isDelete ? "X" : "E", FontSize = 14, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Foreground = isDelete ? Brushes.Red : Brushes.Gray };
 
+                Button fallbackBtn = new Button
+                {
+                    Content = fallbackText,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    Cursor = Cursors.Hand,
+                    Width = 32,
+                    Height = 32,
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(2, 0, 2, 0)
+                };
+                if (!isDelete) fallbackBtn.Click += (s, e) => EditAppointment_Click(apt);
+                else fallbackBtn.Click += (s, e) => RemoveAppointment_Click(apt);
+                return fallbackBtn;
+            }
+
+            // Create the button holding the image
+            Button btn = new Button
+            {
+                Content = img,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Cursor = Cursors.Hand,
+                Width = 34,
+                Height = 34,
+                Padding = new Thickness(0),
+                Margin = new Thickness(2, 0, 2, 0)
+            };
+
+            // Assign Click Events
+            if (!isDelete)
+                btn.Click += (s, e) => EditAppointment_Click(apt);
+            else
+                btn.Click += (s, e) => RemoveAppointment_Click(apt);
+
+            // Hover effect
             btn.MouseEnter += (s, e) => btn.Background = new SolidColorBrush(Color.FromRgb(0xF3, 0xF4, 0xF6));
             btn.MouseLeave += (s, e) => btn.Background = Brushes.Transparent;
+
             return btn;
         }
 

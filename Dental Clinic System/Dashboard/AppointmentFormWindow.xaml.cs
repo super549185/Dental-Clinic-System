@@ -17,6 +17,7 @@ namespace Dental_Clinic_System.Dashboard
         {
             InitializeComponent();
             _dbContext = new AppDbContext();
+            LoadServicesFromDatabase();
 
             if (existingAppointment != null)
             {
@@ -31,23 +32,36 @@ namespace Dental_Clinic_System.Dashboard
         {
             PatientNameBox.Text = apt.PatientName;
 
-            // Safely select Dentist
+            // Dentist (Still uses ComboBoxItems from XAML)
             var dentistItem = DentistBox.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Content.ToString() == apt.Dentist);
             DentistBox.SelectedItem = dentistItem ?? DentistBox.Items[0];
 
-            // Safely select Service
-            var serviceItem = ServiceBox.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Content.ToString() == apt.Service);
-            ServiceBox.SelectedItem = serviceItem ?? ServiceBox.Items[0];
+            // Service (NOW uses Strings from Database - this is what was crashing!)
+            var serviceMatch = ServiceBox.Items.Cast<string>().FirstOrDefault(x => x == apt.Service);
+            if (serviceMatch != null)
+                ServiceBox.SelectedItem = serviceMatch;
+            else if (ServiceBox.Items.Count > 0)
+                ServiceBox.SelectedItem = ServiceBox.Items[0];
 
-            DateBox.SelectedDate = DateTime.Parse(apt.Date);
-
-            // Safely select Time
+            // Time (Still uses ComboBoxItems from XAML)
             var timeItem = TimeBox.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Content.ToString() == apt.Time);
             TimeBox.SelectedItem = timeItem ?? TimeBox.Items[0];
 
-            // Safely select Status (Defaults to Confirmed if the old status was "Pending")
+            // Status (Still uses ComboBoxItems from XAML)
             var statusItem = StatusBox.Items.Cast<ComboBoxItem>().FirstOrDefault(x => x.Content.ToString() == apt.Status);
             StatusBox.SelectedItem = statusItem ?? StatusBox.Items[0];
+        }
+        private void LoadServicesFromDatabase()
+        {
+            ServiceBox.Items.Clear();
+            using (var db = new AppDbContext())
+            {
+                foreach (var service in db.Services.ToList())
+                {
+                    ServiceBox.Items.Add(service.Name);
+                }
+            }
+            if (ServiceBox.Items.Count > 0) ServiceBox.SelectedIndex = 0;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -72,10 +86,10 @@ namespace Dental_Clinic_System.Dashboard
 
             // Get values
             string patientName = PatientNameBox.Text.Trim();
-            string dentist = ((ComboBoxItem)DentistBox.SelectedItem).Content.ToString();
-            string service = ((ComboBoxItem)ServiceBox.SelectedItem).Content.ToString();
+            string dentist = ((ComboBoxItem)DentistBox.SelectedItem).Content.ToString(); 
+            string service = ServiceBox.SelectedItem.ToString();                       
             string date = DateBox.SelectedDate.Value.ToString("yyyy-MM-dd");
-            string time = ((ComboBoxItem)TimeBox.SelectedItem).Content.ToString();
+            string time = ((ComboBoxItem)TimeBox.SelectedItem).Content.ToString();     
             string status = ((ComboBoxItem)StatusBox.SelectedItem).Content.ToString();
 
             try
@@ -89,6 +103,9 @@ namespace Dental_Clinic_System.Dashboard
                     _existingAppointment.Date = date;
                     _existingAppointment.Time = time;
                     _existingAppointment.Status = status;
+
+                    // CRITICAL: Tell the new database context to track and save this changed object
+                    _dbContext.Appointments.Update(_existingAppointment);
                     _dbContext.SaveChanges();
                 }
                 else
