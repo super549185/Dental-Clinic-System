@@ -1,0 +1,96 @@
+﻿<Window x:Class="Dental_Clinic_System.Dashboard.StaffProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Staff Profile" Height="600" Width="850"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Background="#F3F4F6" WindowStyle="None" AllowsTransparency="True">
+
+    <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Background="#F3F4F6">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="Staff Profile" FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Detailed information and history" FontSize="12" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Content="✕" Width="32" Height="32" Background="White" Foreground="#6B7280" BorderThickness="1" BorderBrush="#E5E7EB" FontSize="14" Cursor="Hand" HorizontalAlignment="Right" Click="Close_Click"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- LEFT: Profile Card -->
+                <Border Background="White" CornerRadius="8" Padding="20">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Border Width="150" Height="150" CornerRadius="75" Background="#F3F4F6" Margin="0,0,0,15">
+                            <Image x:Name="ProfileImage" Stretch="UniformToFill" ClipToBounds="True"/>
+                        </Border>
+                        <TextBlock x:Name="TxtName" Text="-" FontSize="16" FontWeight="Bold" Foreground="#111827" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TxtRole" Text="-" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,4,0,10"/>
+                        <Border x:Name="StatusBadge" HorizontalAlignment="Center" CornerRadius="12" Padding="10,3,10,3" Background="#D1FAE5" Margin="0,0,0,15"/>
+                        <TextBlock Text="Schedule" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,3"/>
+                        <TextBlock x:Name="TxtSchedule" Text="-" FontSize="12" Foreground="#4B5563" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- RIGHT: Details -->
+                <StackPanel Grid.Column="2">
+                    <!-- Stats & Services -->
+                    <Border Background="White" CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Schedule &amp; Statistics" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Total Patients" FontSize="11" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="TxtLoad" Text="0" FontSize="22" FontWeight="Bold" Foreground="#111827" Margin="0,3,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Total Appointments" FontSize="11" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="TxtApps" Text="0" FontSize="22" FontWeight="Bold" Foreground="#111827" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Services Offered" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,3"/>
+                            <WrapPanel x:Name="ServicesPanel"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Recent Appointments -->
+                    <Border Background="White" CornerRadius="8" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="Recent Appointments" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <Border Background="#F9FAFB" Height="35" CornerRadius="4" Margin="0,0,0,5">
+                                <Grid Margin="10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="70"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Date" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Patient" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="Treatment" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="Duration" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="AppointmentsList"/>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -57,6 +57,11 @@ namespace Dental_Clinic_System.Dashboard
                     invFrame.Navigate(new InventoryPage());
                     contentGrid.Children.Add(invFrame);
                     break;
+                case "Dentists & Staff":
+                    Frame staffFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
+                    staffFrame.Navigate(new StaffPage());
+                    contentGrid.Children.Add(staffFrame);
+                    break;
 
                 default:
                     TextBlock comingSoon = new TextBlock

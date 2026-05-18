@@ -119,7 +119,7 @@ namespace Dental_Clinic_System.Dashboard
             grid.Children.Add(CreateCell(item.ReorderLevel.ToString(), "#4B5563", FontWeights.Normal, 3));
             grid.Children.Add(CreateCell(FormatDate(item.ExpiryDate), "#4B5563", FontWeights.Normal, 4));
 
-            // ACTIONS COLUMN (+ and - buttons)
+            // ACTIONS COLUMN (+, -, Delete)
             StackPanel actions = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -132,13 +132,13 @@ namespace Dental_Clinic_System.Dashboard
                 Background = "#FEE2E2".ToColor(),
                 Foreground = "#991B1B".ToColor(),
                 BorderThickness = new Thickness(0),
-                FontSize = 16,
+                FontSize = 14,
                 FontWeight = FontWeights.Bold,
                 Cursor = Cursors.Hand,
-                Width = 28,
-                Height = 28,
+                Width = 26,
+                Height = 26,
                 Padding = new Thickness(0, 0, 0, 0),
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 3, 0)
             };
             minusBtn.Click += (s, e) => AdjustStock(item, -1);
             minusBtn.MouseEnter += (s, e) => minusBtn.Background = "#FECACA".ToColor();
@@ -150,19 +150,38 @@ namespace Dental_Clinic_System.Dashboard
                 Background = "#D1FAE5".ToColor(),
                 Foreground = "#065F46".ToColor(),
                 BorderThickness = new Thickness(0),
-                FontSize = 16,
+                FontSize = 14,
                 FontWeight = FontWeights.Bold,
                 Cursor = Cursors.Hand,
-                Width = 28,
-                Height = 28,
-                Padding = new Thickness(0, 0, 0, 0)
+                Width = 26,
+                Height = 26,
+                Padding = new Thickness(0, 0, 0, 0),
+                Margin = new Thickness(0, 0, 3, 0)
             };
             plusBtn.Click += (s, e) => AdjustStock(item, 1);
             plusBtn.MouseEnter += (s, e) => plusBtn.Background = "#A7F3D0".ToColor();
             plusBtn.MouseLeave += (s, e) => plusBtn.Background = "#D1FAE5".ToColor();
 
+            // DELETE BUTTON
+            Button delBtn = new Button
+            {
+                Content = "🗑️",
+                Background = Brushes.Transparent,
+                Foreground = "#EF4444".ToColor(),
+                BorderThickness = new Thickness(0),
+                FontSize = 13,
+                Cursor = Cursors.Hand,
+                Width = 26,
+                Height = 26,
+                Padding = new Thickness(0, 0, 0, 0)
+            };
+            delBtn.Click += (s, e) => DeleteItem(item);
+            delBtn.MouseEnter += (s, e) => delBtn.Background = "#FEE2E2".ToColor();
+            delBtn.MouseLeave += (s, e) => delBtn.Background = Brushes.Transparent;
+
             actions.Children.Add(minusBtn);
             actions.Children.Add(plusBtn);
+            actions.Children.Add(delBtn);
 
             Grid.SetColumn(actions, 5);
             grid.Children.Add(actions);
@@ -189,6 +208,17 @@ namespace Dental_Clinic_System.Dashboard
 
             // Refresh UI to update stats, alerts, and table instantly
             LoadInventory();
+        }
+        private void DeleteItem(InventoryItem item)
+        {
+            MessageBoxResult result = MessageBox.Show($"Are you sure you want to permanently delete '{item.Name}'?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                _dbContext.Inventory.Remove(item);
+                _dbContext.SaveChanges();
+                LoadInventory(); // Refreshes stats, alerts, and table
+            }
         }
 
         private void ReorderItem(InventoryItem item)

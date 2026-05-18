@@ -43,13 +43,7 @@
 
                 <!-- Dentist -->
                 <TextBlock Text="DENTIST" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
-                <ComboBox x:Name="DentistBox" Height="38" Padding="10,0" 
-                          Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" 
-                          FontSize="13" VerticalContentAlignment="Center" SelectedIndex="0">
-                    <ComboBoxItem Content="Dr. Santos"/>
-                    <ComboBoxItem Content="Dr. Reyes"/>
-                    <ComboBoxItem Content="Dr. Cruz"/>
-                </ComboBox>
+                <ComboBox x:Name="DentistBox" Height="38" Padding="10,0" Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" FontSize="13" VerticalContentAlignment="Center" SelectionChanged="DentistBox_SelectionChanged"/>
 
                 <Border Height="15"/>
 
@@ -78,16 +72,7 @@
 
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="TIME" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
-                        <ComboBox x:Name="TimeBox" Height="38" Padding="10,0" 
-                                  Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" 
-                                  FontSize="13" VerticalContentAlignment="Center" SelectedIndex="0">
-                            <ComboBoxItem Content="09:00 AM"/>
-                            <ComboBoxItem Content="10:00 AM"/>
-                            <ComboBoxItem Content="11:00 AM"/>
-                            <ComboBoxItem Content="01:00 PM"/>
-                            <ComboBoxItem Content="02:00 PM"/>
-                            <ComboBoxItem Content="03:00 PM"/>
-                        </ComboBox>
+                        <ComboBox x:Name="TimeBox" Height="38" Padding="10,0" Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" FontSize="13" VerticalContentAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 

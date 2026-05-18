@@ -18,12 +18,11 @@ namespace Dental_Clinic_System.Dashboard
             _dbContext = new AppDbContext();
             _dbContext.Database.EnsureCreated();
             LoadTodayData();
+            LoadDentistsOnDuty();
         }
 
         private void LoadTodayData()
         {
-            _dbContext.Database.EnsureCreated();
-
             string todayStr = DateTime.Today.ToString("yyyy-MM-dd");
 
             var todayApts = _dbContext.Appointments
@@ -50,9 +49,68 @@ namespace Dental_Clinic_System.Dashboard
             }
         }
 
+        private void LoadDentistsOnDuty()
+        {
+            OnDutyList.Children.Clear();
+            // Get all dentists, then filter dynamically based on time
+            var allDentists = _dbContext.Staff.Where(s => s.Role == "Dentist").ToList();
+            var activeDentists = allDentists.Where(s => StaffHelper.GetDynamicStatus(s) == "On Duty").ToList();
+
+            int totalDentists = _dbContext.Staff.Count(s => s.Role == "Dentist");
+            DutyCount.Text = $"{activeDentists.Count} / {totalDentists} Active";
+
+            if (!activeDentists.Any())
+            {
+                OnDutyList.Children.Add(new TextBlock
+                {
+                    Text = "No dentists on duty",
+                    FontSize = 12,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x9C, 0xA3, 0xAF))
+                });
+                return;
+            }
+
+            // Display each active dentist beautifully
+            foreach (var doc in activeDentists)
+            {
+                Border row = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
+                    CornerRadius = new CornerRadius(4),
+                    Padding = new Thickness(8, 5, 8, 5),
+                    Margin = new Thickness(0, 0, 0, 4)
+                };
+
+                StackPanel sp = new StackPanel { Orientation = Orientation.Horizontal };
+
+                // Green dot indicator
+                Border dot = new Border
+                {
+                    Width = 8,
+                    Height = 8,
+                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromRgb(0x10, 0xB9, 0x81)),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 8, 0)
+                };
+
+                sp.Children.Add(dot);
+                sp.Children.Add(new TextBlock
+                {
+                    Text = doc.Name,
+                    FontSize = 12,
+                    FontWeight = FontWeights.Medium,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x11, 0x18, 0x27)),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+
+                row.Child = sp;
+                OnDutyList.Children.Add(row);
+            }
+        }
+
         private Border CreateTableRow(AppointmentItem apt, int index)
         {
-            // Margin matches the header (25 left/right)
             Border row = new Border
             {
                 Height = 55,
