@@ -30,9 +30,9 @@ namespace Dental_Clinic_System.Dashboard
             {
                 _dbContext.Patients.AddRange(new List<PatientItem>
                 {
-                    new PatientItem { PatientId = "P001", Name = "John Doe", Contact = "(555) 123-4567", Email = "john@example.com", LastVisit = "2025-01-15", Status = "Active", DateOfBirth = "1985-06-15", Address = "123 Main St, City", Allergies = "Penicillin", MedicalConditions = "Diabetes", BloodType = "O+" },
-                    new PatientItem { PatientId = "P002", Name = "Jane Wilson", Contact = "(555) 987-6543", Email = "jane@example.com", LastVisit = "2025-01-10", Status = "Active", DateOfBirth = "1990-02-20", Address = "456 Oak Ave, Town", Allergies = "None", MedicalConditions = "None", BloodType = "A+" },
-                    new PatientItem { PatientId = "P003", Name = "Mike Brown", Contact = "(555) 555-1234", Email = "mike@example.com", LastVisit = "2024-12-20", Status = "Inactive", DateOfBirth = "1978-11-05", Address = "789 Pine Rd, Village", Allergies = "Sulfa drugs", MedicalConditions = "Hypertension", BloodType = "B-" }
+                    new PatientItem { PatientId = "P001", Name = "Gilbert Torres", Contact = "(555) 123-4567", Email = "g.torres.549720@umindanao.edu.ph", LastVisit = "2026-01-15", Status = "Active", DateOfBirth = "1985-06-15", Address = "123 Main St, City", Allergies = "Penicillin", MedicalConditions = "Diabetes", BloodType = "O+" },
+                    new PatientItem { PatientId = "P002", Name = "Richfield Bernaldez", Contact = "(555) 987-6543", Email = "r.bernaldez.549185@umindanao.edu.ph", LastVisit = "2026-01-10", Status = "Active", DateOfBirth = "1990-02-20", Address = "456 Oak Ave, Town", Allergies = "None", MedicalConditions = "None", BloodType = "A+" },
+                    new PatientItem { PatientId = "P003", Name = "Jerfel Maamo", Contact = "(555) 555-1234", Email = "j.maamo.545112@umindanao.edu.ph", LastVisit = "2025-12-20", Status = "Inactive", DateOfBirth = "1978-11-05", Address = "789 Pine Rd, Village", Allergies = "Sulfa drugs", MedicalConditions = "Hypertension", BloodType = "B-" }
                 });
                 _dbContext.SaveChanges();
             }

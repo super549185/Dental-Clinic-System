@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Dental_Clinic_System.Data;
 using Dental_Clinic_System.Models;
 
@@ -43,11 +44,11 @@ namespace Dental_Clinic_System.Dashboard
                     Random rnd = new Random();
                     _dbContext.Appointments.AddRange(new List<AppointmentItem>
                     {
-                        new AppointmentItem { AppointmentId = "APT001", PatientName = "John Doe",     Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[0], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT002", PatientName = "Jane Wilson",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[1], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT003", PatientName = "Mark Sanchez", Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[2], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT004", PatientName = "Emily Davis",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2025-02-05",  Time = validTimes[3], Status = "Cancelled" },
-                        new AppointmentItem { AppointmentId = "APT005", PatientName = "Chris Brown",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2025-02-06",  Time = validTimes[4], Status = "Cancelled" }
+                        new AppointmentItem { AppointmentId = "APT001", PatientName = "Gilbert Torres",     Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[0], Status = "Confirmed" },
+                        new AppointmentItem { AppointmentId = "APT002", PatientName = "Richfield Bernaldez",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[1], Status = "Confirmed" },
+                        new AppointmentItem { AppointmentId = "APT003", PatientName = "Jerfel Maamo", Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[2], Status = "Confirmed" },
+                        new AppointmentItem { AppointmentId = "APT004", PatientName = "Angelo Macalibo",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-05",  Time = validTimes[3], Status = "Cancelled" },
+                        new AppointmentItem { AppointmentId = "APT005", PatientName = "Jay-Al Gallenero",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-06",  Time = validTimes[4], Status = "Cancelled" }
                     });
                 }
                 _dbContext.SaveChanges();
@@ -104,7 +105,6 @@ namespace Dental_Clinic_System.Dashboard
                 Padding = new Thickness(15, 0, 15, 0)
             };
 
-            // Hover highlight
             row.MouseEnter += (s, e) => row.Background = new SolidColorBrush(Color.FromRgb(0xF0, 0xFD, 0xFA));
             row.MouseLeave += (s, e) => row.Background = index % 2 == 0
                 ? Brushes.White
@@ -117,7 +117,7 @@ namespace Dental_Clinic_System.Dashboard
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60, GridUnitType.Pixel) });
 
             grid.Children.Add(CreateCell(apt.AppointmentId, "#6B7280", FontWeights.Normal, 0));
             grid.Children.Add(CreateCell(apt.PatientName, "#111827", FontWeights.SemiBold, 1));
@@ -131,9 +131,7 @@ namespace Dental_Clinic_System.Dashboard
             return row;
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // IMPROVED ACTION BUTTONS — pill-shaped labeled buttons
-        // ─────────────────────────────────────────────────────────────
+        // ── Image-only action buttons — same style as PatientPage ──────
         private StackPanel CreateActionButtons(AppointmentItem apt, int col)
         {
             StackPanel panel = new StackPanel
@@ -143,92 +141,71 @@ namespace Dental_Clinic_System.Dashboard
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            // ── EDIT BUTTON ──
-            Border editBtn = CreatePillButton(
-                icon: "✏",
-                label: "Edit",
-                normalBg: Color.FromRgb(0xDB, 0xEA, 0xFE),  // light blue
-                hoverBg: Color.FromRgb(0xBF, 0xDB, 0xFE),
-                textColor: Color.FromRgb(0x1D, 0x4E, 0xD8)   // dark blue
-            );
-            editBtn.Margin = new Thickness(0, 0, 6, 0);
-            editBtn.MouseLeftButtonUp += (s, e) =>
-            {
-                e.Handled = true;
-                EditAppointment_Click(apt);
-            };
-
-            // ── DELETE BUTTON ──
-            Border delBtn = CreatePillButton(
-                icon: "🗑",
-                label: "Delete",
-                normalBg: Color.FromRgb(0xFE, 0xE2, 0xE2),  // light red
-                hoverBg: Color.FromRgb(0xFE, 0xCA, 0xCA),
-                textColor: Color.FromRgb(0x99, 0x1B, 0x1B)   // dark red
-            );
-            delBtn.MouseLeftButtonUp += (s, e) =>
-            {
-                e.Handled = true;
-                RemoveAppointment_Click(apt);
-            };
-
-            panel.Children.Add(editBtn);
-            panel.Children.Add(delBtn);
+            panel.Children.Add(CreateImageButton("Images/edit.png", apt, isDelete: false));
+            panel.Children.Add(CreateImageButton("Images/delete.png", apt, isDelete: true));
 
             Grid.SetColumn(panel, col);
             return panel;
         }
 
-        /// <summary>
-        /// Creates a small pill-shaped button with an icon and text label.
-        /// </summary>
-        private Border CreatePillButton(string icon, string label,
-            Color normalBg, Color hoverBg, Color textColor)
+        private Button CreateImageButton(string imagePath, AppointmentItem apt, bool isDelete)
         {
-            var bg = new SolidColorBrush(normalBg);
-            var hover = new SolidColorBrush(hoverBg);
-            var fg = new SolidColorBrush(textColor);
-
-            StackPanel content = new StackPanel
+            // Try loading the image; fall back to emoji text if missing
+            System.Windows.Controls.Image img = new System.Windows.Controls.Image
             {
-                Orientation = Orientation.Horizontal,
-                VerticalAlignment = VerticalAlignment.Center
+                Width = 18,
+                Height = 18,
+                Stretch = Stretch.UniformToFill
             };
 
-            content.Children.Add(new TextBlock
+            object btnContent;
+            try
             {
-                Text = icon,
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 4, 0)
-            });
-            content.Children.Add(new TextBlock
+                img.Source = new BitmapImage(new Uri($"pack://application:,,,/{imagePath}", UriKind.Absolute));
+                btnContent = img;
+            }
+            catch
             {
-                Text = label,
-                FontSize = 11,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = fg,
-                VerticalAlignment = VerticalAlignment.Center
-            });
+                btnContent = new TextBlock
+                {
+                    Text = isDelete ? "✕" : "✏",
+                    FontSize = 15,
+                    FontWeight = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = isDelete ? Brushes.Red : Brushes.SteelBlue
+                };
+            }
 
-            Border pill = new Border
+            Button btn = new Button
             {
-                Background = bg,
-                CornerRadius = new CornerRadius(20),
-                Padding = new Thickness(10, 4, 10, 4),
+                Content = btnContent,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
                 Cursor = Cursors.Hand,
-                Child = content
+                Width = 34,
+                Height = 34,
+                Padding = new Thickness(0),
+                Margin = new Thickness(2, 0, 2, 0)
             };
 
-            pill.MouseEnter += (s, e) => pill.Background = hover;
-            pill.MouseLeave += (s, e) => pill.Background = bg;
+            // Hover tint
+            Color hoverColor = isDelete
+                ? Color.FromRgb(0xFE, 0xE2, 0xE2)   // light red
+                : Color.FromRgb(0xDB, 0xEA, 0xFE);   // light blue
 
-            return pill;
+            btn.MouseEnter += (s, e) => btn.Background = new SolidColorBrush(hoverColor);
+            btn.MouseLeave += (s, e) => btn.Background = Brushes.Transparent;
+
+            if (!isDelete)
+                btn.Click += (s, e) => EditAppointment_Click(apt);
+            else
+                btn.Click += (s, e) => RemoveAppointment_Click(apt);
+
+            return btn;
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // UI HELPERS
-        // ─────────────────────────────────────────────────────────────
+        // ── UI Helpers ─────────────────────────────────────────────────
         private TextBlock CreateCell(string text, string hexColor, FontWeight weight, int col)
         {
             var tb = new TextBlock
@@ -295,9 +272,7 @@ namespace Dental_Clinic_System.Dashboard
             return d;
         }
 
-        // ─────────────────────────────────────────────────────────────
-        // EVENTS
-        // ─────────────────────────────────────────────────────────────
+        // ── Events ─────────────────────────────────────────────────────
         private void AddAppointment_Click(object sender, RoutedEventArgs e)
         {
             if (new AppointmentFormWindow().ShowDialog() == true) LoadAppointments();
