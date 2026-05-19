@@ -75,7 +75,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Text="Income Today" FontSize="12" Foreground="#6B7280"/>
-                    <TextBlock Grid.Row="1" Text="$4,850" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="1" Text=" ₱4,850" FontSize="26" FontWeight="Bold" Foreground="#111827" Margin="0,5,0,0"/>
                     <TextBlock Grid.Row="2" FontSize="11" Foreground="#10B981" Margin="0,5,0,0"><Run Text="↑ 15% "/><Run Text="from yesterday" Foreground="#9CA3AF"/></TextBlock>
                 </Grid>
             </Border>

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Dental_Clinic_System.Data;
+using Dental_Clinic_System.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,14 +24,14 @@ namespace Dental_Clinic_System
         // ================= PASSWORD TOGGLE STATES =================
         private bool isPasswordVisible = false;
         private bool isConfirmPasswordVisible = false;
+        private AppDbContext _dbContext;
 
         public RegisterPage()
         {
             InitializeComponent();
-        }   
-
-        // ================= REGISTER BUTTON =================
-        
+            _dbContext = new AppDbContext();
+            _dbContext.Database.EnsureCreated();
+        }
 
         // ================= PLACEHOLDERS =================
         private void FullNameTextBox_GotFocus(object sender, RoutedEventArgs e)
@@ -78,7 +81,7 @@ namespace Dental_Clinic_System
             if (string.IsNullOrWhiteSpace(UsernameTextBox.Text))
             {
                 UsernameTextBox.Text = "Username";
-                UsernameTextBox.Foreground = Brushes.Gray;                  
+                UsernameTextBox.Foreground = Brushes.Gray;
             }
         }
 
@@ -182,7 +185,7 @@ namespace Dental_Clinic_System
                 string.IsNullOrEmpty(password))
             {
                 MessageBox.Show("Please fill in all fields.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;             
+                return;
             }
 
             if (password != confirm)
@@ -191,9 +194,64 @@ namespace Dental_Clinic_System
                 return;
             }
 
-            // TODO: Save registration details
-            MessageBox.Show("Registration successful.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-            (Application.Current.MainWindow as MainWindow)?.NavigateToLogin();
+            // Check if username already exists
+            if (_dbContext.Users.Any(u => u.Username == username))
+            {
+                MessageBox.Show("Username already exists. Please choose another.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Check if email already exists
+            if (_dbContext.Users.Any(u => u.Email == email))
+            {
+                MessageBox.Show("Email already registered. Please use another.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Validate email format
+            if (!IsValidEmail(email))
+            {
+                MessageBox.Show("Please enter a valid email address.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Create new user
+            var newUser = new UserItem
+            {
+                FullName = fullName,
+                ClinicName = clinicName,
+                Username = username,
+                Email = email,
+                PasswordHash = AuthHelper.HashPassword(password),
+                CreatedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                IsActive = true
+            };
+
+            try
+            {
+                _dbContext.Users.Add(newUser);
+                _dbContext.SaveChanges();
+
+                MessageBox.Show("Registration successful! Please login with your credentials.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                (Application.Current.MainWindow as MainWindow)?.NavigateToLogin();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Registration failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // ================= PASSWORD TOGGLE =================
@@ -216,7 +274,7 @@ namespace Dental_Clinic_System
                 PasswordBox.Visibility = Visibility.Visible;
                 PasswordEyeIcon.Text = "👁";
                 isPasswordVisible = false;
-           
+
                 PasswordPlaceholder.Visibility = PasswordBox.Password.Length == 0 ? Visibility.Visible : Visibility.Hidden;
             }
         }
@@ -242,5 +300,6 @@ namespace Dental_Clinic_System
                 ConfirmPasswordPlaceholder.Visibility = ConfirmPasswordBox.Password.Length == 0 ? Visibility.Visible : Visibility.Hidden;
             }
         }
+
     }
 }

@@ -13,6 +13,7 @@
     <None Remove="Images\default-avatar.png" />
     <None Remove="Images\delete.png" />
     <None Remove="Images\edit.png" />
+    <None Remove="Images\tooth.png" />
     <None Remove="Images\view.png" />
   </ItemGroup>
 
@@ -34,6 +35,7 @@
     <Resource Include="Images\default-avatar.png" />
     <Resource Include="Images\delete.png" />
     <Resource Include="Images\edit.png" />
+    <Resource Include="Images\tooth.png" />
     <Resource Include="Images\view.png" />
   </ItemGroup>
 

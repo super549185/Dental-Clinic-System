@@ -1,4 +1,8 @@
 ﻿using Dental_Clinic_System.Dashboard;
+using Dental_Clinic_System.Data;
+using Dental_Clinic_System.Models;
+using System;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,10 +22,13 @@ namespace Dental_Clinic_System
     public partial class MainWindow : Window
     {
         private bool isLoginPasswordVisible = false;
+        private AppDbContext _dbContext;
 
         public MainWindow()
         {
             InitializeComponent();
+            _dbContext = new AppDbContext();
+            _dbContext.Database.EnsureCreated();
         }
 
         /* ===================== TEXTBOX PLACEHOLDER ===================== */
@@ -119,12 +126,42 @@ namespace Dental_Clinic_System
             if (string.IsNullOrEmpty(username) || username == "Username" || string.IsNullOrEmpty(password))
             {
                 ErrorMessage.Visibility = Visibility.Visible;
+                ErrorMessage.Text = "Please enter username and password";
                 return;
             }
 
-            // For now accept any non-empty credentials as successful login
+            // Authenticate user against database
+            var user = _dbContext.Users.FirstOrDefault(u => u.Username == username);
+
+            if (user == null)
+            {
+                ErrorMessage.Visibility = Visibility.Visible;
+                ErrorMessage.Text = "Username not found";
+                return;
+            }
+
+            if (!user.IsActive)
+            {
+                ErrorMessage.Visibility = Visibility.Visible;
+                ErrorMessage.Text = "User account is inactive";
+                return;
+            }
+
+            if (!AuthHelper.VerifyPassword(password, user.PasswordHash))
+            {
+                ErrorMessage.Visibility = Visibility.Visible;
+                ErrorMessage.Text = "Invalid password";
+                return;
+            }
+
+            // Store current user globally for the session
+            CurrentUser.Username = user.Username;
+            CurrentUser.ClinicName = user.ClinicName;
+            CurrentUser.FullName = user.FullName;
+            CurrentUser.Id = user.UserId;
+
             ErrorMessage.Visibility = Visibility.Collapsed;
-            MessageBox.Show("Login successful.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Welcome {user.FullName}!", "Login Successful", MessageBoxButton.OK, MessageBoxImage.Information);
             DashboardWindow dashboard = new DashboardWindow();
             dashboard.Show();
             this.Close();
@@ -138,6 +175,6 @@ namespace Dental_Clinic_System
             LoginGrid.Visibility = Visibility.Visible;
         }
 
-       
     }
-    }
+}
+    

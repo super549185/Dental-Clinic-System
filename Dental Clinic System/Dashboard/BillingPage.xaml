@@ -34,9 +34,9 @@
                      Columns="4"
                      Margin="0,20,0,0">
 
-            <!-- Card 1 -->
+            <!-- Card 1 - Total Revenue -->
             <Border Background="White"
-                    CornerRadius="12"
+                    CornerRadius="8"
                     Margin="0,0,15,0"
                     Padding="20"
                     BorderBrush="#E2E8F0"
@@ -45,17 +45,18 @@
                     <TextBlock Text="Total Revenue"
                                FontSize="14"
                                Foreground="#64748B"/>
-                    <TextBlock Text="$45,850"
+                    <TextBlock x:Name="TotalRevenueText"
+                               Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#0F766E"
-                               Margin="0,10,0,0"/>
+                               />
                 </StackPanel>
             </Border>
 
-            <!-- Card 2 -->
+            <!-- Card 2 - Paid Invoices -->
             <Border Background="White"
-                    CornerRadius="12"
+                    CornerRadius="8"
                     Margin="0,0,15,0"
                     Padding="20"
                     BorderBrush="#E2E8F0"
@@ -64,36 +65,38 @@
                     <TextBlock Text="Paid Invoices"
                                FontSize="14"
                                Foreground="#64748B"/>
-                    <TextBlock Text="$38,200"
+                    <TextBlock x:Name="PaidInvoicesText"
+                               Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#16A34A"
-                               Margin="0,10,0,0"/>
+                               />
                 </StackPanel>
             </Border>
 
-            <!-- Card 3 -->
+            <!-- Card 3 - Pending Invoices -->
             <Border Background="White"
-                    CornerRadius="12"
+                    CornerRadius="8"
                     Margin="0,0,15,0"
                     Padding="20"
                     BorderBrush="#E2E8F0"
                     BorderThickness="1">
                 <StackPanel>
-                    <TextBlock Text="Unpaid Invoices"
+                    <TextBlock Text="Pending Invoices"
                                FontSize="14"
                                Foreground="#64748B"/>
-                    <TextBlock Text="$7,650"
+                    <TextBlock x:Name="PendingInvoicesText"
+                               Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#DC2626"
-                               Margin="0,10,0,0"/>
+                               />
                 </StackPanel>
             </Border>
 
-            <!-- Card 4 -->
+            <!-- Card 4 - Total Billings -->
             <Border Background="White"
-                    CornerRadius="12"
+                    CornerRadius="8"
                     Padding="20"
                     BorderBrush="#E2E8F0"
                     BorderThickness="1">
@@ -101,11 +104,12 @@
                     <TextBlock Text="Total Invoices"
                                FontSize="14"
                                Foreground="#64748B"/>
-                    <TextBlock Text="245"
+                    <TextBlock x:Name="TotalBillingsText"
+                               Text="0"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="#0F766E"
-                               Margin="0,10,0,0"/>
+                               />
                 </StackPanel>
             </Border>
         </UniformGrid>
@@ -113,9 +117,10 @@
         <!-- Invoice Table -->
         <Border Grid.Row="3"
                 Background="White"
-                CornerRadius="12"
+                CornerRadius="8"
                 BorderBrush="#E2E8F0"
-                BorderThickness="1">
+                BorderThickness="1"
+                Margin="0,10,0,0">
 
             <StackPanel>
 
@@ -124,12 +129,14 @@
                            FontWeight="SemiBold"
                            Margin="25,20,0,20"/>
 
-                <DataGrid AutoGenerateColumns="False"
+                <DataGrid x:Name="BillingDataGrid"
+                          AutoGenerateColumns="False"
                           HeadersVisibility="Column"
                           GridLinesVisibility="None"
                           BorderThickness="0"
                           RowHeight="60"
-                          FontSize="15">
+                          FontSize="15"
+                          CanUserAddRows="False">
 
                     <DataGrid.Columns>
 
@@ -142,7 +149,7 @@
                                             Width="200"/>
 
                         <DataGridTextColumn Header="AMOUNT"
-                                            Binding="{Binding Amount}"
+                                            Binding="{Binding Amount, StringFormat=C}"
                                             Width="120"/>
 
                         <DataGridTextColumn Header="STATUS"
@@ -155,23 +162,35 @@
 
                         <DataGridTextColumn Header="PAYMENT METHOD"
                                             Binding="{Binding PaymentMethod}"
-                                            Width="200"/>
+                                            Width="150"/>
 
-                        <!-- Button -->
+                        <!-- Actions Column -->
                         <DataGridTemplateColumn Header="ACTIONS"
                                                 Width="120">
 
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
 
-                                    <Button Content="View"
-                                            Width="80"
-                                            Height="35"
-                                            Background="#0F766E"
-                                            Foreground="White"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Click="ViewReceipt_Click"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Content="View"
+                                                Width="50"
+                                                Height="30"
+                                                Background="#0F766E"
+                                                Foreground="White"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Click="ViewReceipt_Click"
+                                                Margin="0,0,5,0"/>
+
+                                        <Button Content="Delete"
+                                                Width="50"
+                                                Height="30"
+                                                Background="#DC2626"
+                                                Foreground="White"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Click="DeleteBilling_Click"/>
+                                    </StackPanel>
 
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

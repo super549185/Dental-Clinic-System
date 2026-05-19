@@ -13,6 +13,8 @@ namespace Dental_Clinic_System.Data
         public DbSet<InventoryItem> Inventory { get; set; }
         public DbSet<StaffItem> Staff { get; set; }
         public DbSet<DentalHistoryItem> DentalHistory { get; set; }
+        public DbSet<BillingItem> Billings { get; set; }
+        public DbSet<UserItem> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

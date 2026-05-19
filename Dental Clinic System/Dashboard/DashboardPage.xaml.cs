@@ -19,6 +19,7 @@ namespace Dental_Clinic_System.Dashboard
             _dbContext.Database.EnsureCreated();
             LoadTodayData();
             LoadDentistsOnDuty();
+            LoadBillingStats();
         }
 
         private void LoadTodayData()
@@ -106,6 +107,25 @@ namespace Dental_Clinic_System.Dashboard
 
                 row.Child = sp;
                 OnDutyList.Children.Add(row);
+            }
+        }
+
+        private void LoadBillingStats()
+        {
+            try
+            {
+                var billings = _dbContext.Billings.ToList();
+                decimal totalBilled = billings.Sum(b => b.Amount);
+                decimal totalPaid = billings.Where(b => b.PaymentStatus == "Paid").Sum(b => b.Amount);
+                int pendingCount = billings.Count(b => b.PaymentStatus == "Pending" || b.PaymentStatus == "Partial");
+
+                // Add billing stats to dashboard (if you have UI elements for these)
+                // This could update TextBlocks or other UI elements
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                System.Diagnostics.Debug.WriteLine($"Error loading billing stats: {ex.Message}");
             }
         }
 
