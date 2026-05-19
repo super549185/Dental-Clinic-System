@@ -53,8 +53,6 @@ namespace Dental_Clinic_System.Dashboard
                 foreach (var staff in db.Staff.Where(s => s.Role == "Dentist").ToList())
                 {
                     string dynamicStatus = StaffHelper.GetDynamicStatus(staff);
-                    // Show name with status tag so the user knows who is off-duty
-                    // We store just the name but display status as a suffix
                     string displayName = dynamicStatus == "On Duty"
                         ? staff.Name
                         : $"{staff.Name} (Off Duty)";
@@ -80,8 +78,8 @@ namespace Dental_Clinic_System.Dashboard
         {
             TimeBox.Items.Clear();
 
-            int startHour = 8;  // default fallback
-            int endHour = 17; // default fallback
+            int startHour = 8;
+            int endHour = 17;
 
             if (!string.IsNullOrEmpty(realDentistName))
             {
@@ -90,16 +88,13 @@ namespace Dental_Clinic_System.Dashboard
                     var staff = db.Staff.FirstOrDefault(s => s.Name == realDentistName);
                     if (staff != null && !string.IsNullOrEmpty(staff.Schedule))
                     {
-                        // Schedule format: "Mon-Fri 09:00 AM - 05:00 PM"
-                        // parts[0]=days, parts[1]=startTime, parts[2]=AM/PM,
-                        // parts[3]="-",  parts[4]=endTime,   parts[5]=AM/PM
                         string[] parts = staff.Schedule.Split(
                             new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                         if (parts.Length >= 6)
                         {
-                            string startStr = parts[1] + " " + parts[2]; // "09:00 AM"
-                            string endStr = parts[4] + " " + parts[5]; // "05:00 PM"
+                            string startStr = parts[1] + " " + parts[2];
+                            string endStr = parts[4] + " " + parts[5];
 
                             if (DateTime.TryParse(startStr, out DateTime parsedStart))
                                 startHour = parsedStart.Hour;
@@ -111,15 +106,12 @@ namespace Dental_Clinic_System.Dashboard
                 }
             }
 
-            // Build 1-hour slots from startHour up to (but not including) endHour
-            // e.g. 9 AM to 5 PM → 09:00 AM, 10:00 AM … 04:00 PM  (last slot starts at endHour-1)
             for (int hour = startHour; hour < endHour; hour++)
             {
                 string time = DateTime.Today.AddHours(hour).ToString("hh:mm tt");
                 TimeBox.Items.Add(time);
             }
 
-            // Re-select a specific time if requested (edit mode)
             if (!string.IsNullOrEmpty(preSelectTime))
             {
                 var match = TimeBox.Items.OfType<string>()
@@ -173,7 +165,6 @@ namespace Dental_Clinic_System.Dashboard
 
         // ─────────────────────────────────────────────────────────────
         // DENTIST SELECTION CHANGED
-        // Refreshes both the TIME slots and SERVICES when dentist changes
         // ─────────────────────────────────────────────────────────────
         private void DentistBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -182,29 +173,19 @@ namespace Dental_Clinic_System.Dashboard
 
             string realName = GetRealDentistName(DentistBox.SelectedItem.ToString());
 
-            // Refresh time slots to match this dentist's working hours
             GenerateTimeIntervalsForDentist(realName);
-
-            // Refresh services to match this dentist's offered services
             PopulateServicesForDentist(realName);
-
-            // Show a subtle hint if the dentist is off-duty
             UpdateOffDutyWarning(DentistBox.SelectedItem.ToString());
         }
 
         // ─────────────────────────────────────────────────────────────
-        // OFF-DUTY WARNING — reuses the subtitle TextBlock in the header
+        // OFF-DUTY WARNING
         // ─────────────────────────────────────────────────────────────
         private void UpdateOffDutyWarning(string displayName)
         {
-            // The XAML header has a subtitle TextBlock with Text="Fill in the details below"
-            // We update it to warn when an off-duty dentist is selected
             if (displayName.Contains("(Off Duty)"))
             {
                 string realName = GetRealDentistName(displayName);
-                // Find the subtitle TextBlock in the header and update it
-                // We'll use the Tag property trick via the named element if available,
-                // otherwise walk the visual tree from FormTitle's parent
                 UpdateSubtitle($"⚠  {realName} is currently Off Duty — appointment will still be saved.");
             }
             else
@@ -215,15 +196,14 @@ namespace Dental_Clinic_System.Dashboard
 
         private void UpdateSubtitle(string text)
         {
-            // FormTitle is in a StackPanel; its sibling is the subtitle TextBlock
             if (FormTitle.Parent is StackPanel sp && sp.Children.Count > 1)
             {
                 if (sp.Children[1] is TextBlock subtitle)
                 {
                     subtitle.Text = text;
                     subtitle.Foreground = text.StartsWith("⚠")
-                        ? new SolidColorBrush(Color.FromRgb(0xFF, 0xD7, 0x00))  // yellow warning
-                        : new SolidColorBrush(Color.FromRgb(0xA7, 0xF3, 0xD0)); // original green
+                        ? new SolidColorBrush(Color.FromRgb(0xFF, 0xD7, 0x00))
+                        : new SolidColorBrush(Color.FromRgb(0xA7, 0xF3, 0xD0));
                 }
             }
         }
@@ -235,10 +215,8 @@ namespace Dental_Clinic_System.Dashboard
         {
             _isLoadingData = true;
 
-            // 1. Patient name
             PatientNameBox.Text = apt.PatientName;
 
-            // 2. Select dentist — match by real name (strip Off Duty suffix if present)
             var dentistMatch = DentistBox.Items.OfType<string>()
                 .FirstOrDefault(x => GetRealDentistName(x) == apt.Dentist);
 
@@ -249,22 +227,16 @@ namespace Dental_Clinic_System.Dashboard
 
             string realDentistName = GetRealDentistName(DentistBox.SelectedItem?.ToString() ?? "");
 
-            // 3. Generate time slots for this dentist AND pre-select existing time
             GenerateTimeIntervalsForDentist(realDentistName, apt.Time);
-
-            // 4. Populate services AND pre-select existing service
             PopulateServicesForDentist(realDentistName, apt.Service);
 
-            // 5. Date
             if (!string.IsNullOrEmpty(apt.Date))
                 DateBox.SelectedDate = DateTime.Parse(apt.Date);
 
-            // 6. Status
             var statusItem = StatusBox.Items.Cast<ComboBoxItem>()
                 .FirstOrDefault(x => x.Content.ToString() == apt.Status);
             StatusBox.SelectedItem = statusItem ?? (StatusBox.Items.Count > 0 ? StatusBox.Items[0] : null);
 
-            // 7. Show off-duty warning if applicable
             UpdateOffDutyWarning(DentistBox.SelectedItem?.ToString() ?? "");
 
             _isLoadingData = false;
@@ -273,7 +245,7 @@ namespace Dental_Clinic_System.Dashboard
         private void Cancel_Click(object sender, RoutedEventArgs e) => this.DialogResult = false;
 
         // ─────────────────────────────────────────────────────────────
-        // SAVE — step-by-step validation + conflict checks
+        // SAVE — validation + conflict checks + FIXED edit logic
         // ─────────────────────────────────────────────────────────────
         private void Save_Click(object sender, RoutedEventArgs e)
         {
@@ -338,7 +310,6 @@ namespace Dental_Clinic_System.Dashboard
             try
             {
                 string patientName = PatientNameBox.Text.Trim();
-                // Always use the real name (strip Off Duty tag) when saving
                 string dentist = GetRealDentistName(DentistBox.SelectedItem.ToString());
                 string date = DateBox.SelectedDate.Value.ToString("yyyy-MM-dd");
                 string time = TimeBox.SelectedItem.ToString();
@@ -406,13 +377,32 @@ namespace Dental_Clinic_System.Dashboard
                 // ── All checks passed — Save ──
                 if (isEditMode && _existingAppointment != null)
                 {
-                    _existingAppointment.PatientName = patientName;
-                    _existingAppointment.Dentist = dentist;
-                    _existingAppointment.Service = service;
-                    _existingAppointment.Date = date;
-                    _existingAppointment.Time = time;
-                    _existingAppointment.Status = status;
-                    _dbContext.Appointments.Update(_existingAppointment);
+                    // ★★★ THE FIX: Fetch a fresh tracked entity from THIS context,
+                    // then update its properties. Never call Update() on the
+                    // detached copy that came from AppointmentPage's context. ★★★
+                    var trackedEntity = _dbContext.Appointments
+                        .FirstOrDefault(a => a.AppointmentId == _existingAppointment.AppointmentId);
+
+                    if (trackedEntity != null)
+                    {
+                        trackedEntity.PatientName = patientName;
+                        trackedEntity.Dentist = dentist;
+                        trackedEntity.Service = service;
+                        trackedEntity.Date = date;
+                        trackedEntity.Time = time;
+                        trackedEntity.Status = status;
+
+                        // No .Update() call needed — EF Core auto-detects
+                        // changes on tracked entities during SaveChanges()
+                    }
+                    else
+                    {
+                        ShowValidationError(
+                            "Not Found",
+                            $"Appointment {_existingAppointment.AppointmentId} was not found in the database.\n" +
+                            $"It may have been deleted by another user.");
+                        return;
+                    }
                 }
                 else
                 {

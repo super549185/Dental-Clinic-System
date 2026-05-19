@@ -98,11 +98,11 @@ namespace Dental_Clinic_System.Dashboard
         {
             Border row = new Border
             {
-                MinHeight = 55,
+                MinHeight = 50,
                 Background = index % 2 == 0 ? Brushes.White : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0xF4, 0xF6)),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                Padding = new Thickness(15, 0, 15, 0)
+                Padding = new Thickness(12, 0, 12, 0)
             };
 
             row.MouseEnter += (s, e) => row.Background = new SolidColorBrush(Color.FromRgb(0xF0, 0xFD, 0xFA));
@@ -111,13 +111,13 @@ namespace Dental_Clinic_System.Dashboard
                 : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB));
 
             Grid grid = new Grid { VerticalAlignment = VerticalAlignment.Center };
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(70, GridUnitType.Pixel) });   // ID
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });      // Patient Name (flexible)
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });    // Dentist
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100, GridUnitType.Pixel) });   // Service
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(115, GridUnitType.Pixel) });   // Date & Time
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85, GridUnitType.Pixel) });    // Status
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });    // Actions
 
             grid.Children.Add(CreateCell(apt.AppointmentId, "#6B7280", FontWeights.Normal, 0));
             grid.Children.Add(CreateCell(apt.PatientName, "#111827", FontWeights.SemiBold, 1));
@@ -131,7 +131,6 @@ namespace Dental_Clinic_System.Dashboard
             return row;
         }
 
-        // ── Image-only action buttons — same style as PatientPage ──────
         private StackPanel CreateActionButtons(AppointmentItem apt, int col)
         {
             StackPanel panel = new StackPanel
@@ -140,6 +139,28 @@ namespace Dental_Clinic_System.Dashboard
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
+
+            if (apt.Status == "Confirmed" && !apt.IsCompleted)
+            {
+                Button completeBtn = new Button
+                {
+                    Content = "✓",
+                    Background = new SolidColorBrush(Color.FromRgb(0xD1, 0xFA, 0xE5)),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x06, 0x5F, 0x46)),
+                    BorderThickness = new Thickness(0),
+                    FontSize = 14,
+                    FontWeight = FontWeights.Bold,
+                    Cursor = Cursors.Hand,
+                    Width = 28,
+                    Height = 28,
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(1, 0, 1, 0)
+                };
+                completeBtn.Click += (s, e) => CompleteAppointment_Click(apt);
+                completeBtn.MouseEnter += (s, e) => completeBtn.Background = new SolidColorBrush(Color.FromRgb(0xA7, 0xF3, 0xD0));
+                completeBtn.MouseLeave += (s, e) => completeBtn.Background = new SolidColorBrush(Color.FromRgb(0xD1, 0xFA, 0xE5));
+                panel.Children.Add(completeBtn);
+            }
 
             panel.Children.Add(CreateImageButton("Images/edit.png", apt, isDelete: false));
             panel.Children.Add(CreateImageButton("Images/delete.png", apt, isDelete: true));
@@ -150,11 +171,10 @@ namespace Dental_Clinic_System.Dashboard
 
         private Button CreateImageButton(string imagePath, AppointmentItem apt, bool isDelete)
         {
-            // Try loading the image; fall back to emoji text if missing
             System.Windows.Controls.Image img = new System.Windows.Controls.Image
             {
-                Width = 18,
-                Height = 18,
+                Width = 14,
+                Height = 14,
                 Stretch = Stretch.UniformToFill
             };
 
@@ -169,7 +189,7 @@ namespace Dental_Clinic_System.Dashboard
                 btnContent = new TextBlock
                 {
                     Text = isDelete ? "✕" : "✏",
-                    FontSize = 15,
+                    FontSize = 13,
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
@@ -183,16 +203,15 @@ namespace Dental_Clinic_System.Dashboard
                 Background = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
                 Cursor = Cursors.Hand,
-                Width = 34,
-                Height = 34,
+                Width = 28,
+                Height = 28,
                 Padding = new Thickness(0),
-                Margin = new Thickness(2, 0, 2, 0)
+                Margin = new Thickness(1, 0, 1, 0)
             };
 
-            // Hover tint
             Color hoverColor = isDelete
-                ? Color.FromRgb(0xFE, 0xE2, 0xE2)   // light red
-                : Color.FromRgb(0xDB, 0xEA, 0xFE);   // light blue
+                ? Color.FromRgb(0xFE, 0xE2, 0xE2)
+                : Color.FromRgb(0xDB, 0xEA, 0xFE);
 
             btn.MouseEnter += (s, e) => btn.Background = new SolidColorBrush(hoverColor);
             btn.MouseLeave += (s, e) => btn.Background = Brushes.Transparent;
@@ -205,13 +224,12 @@ namespace Dental_Clinic_System.Dashboard
             return btn;
         }
 
-        // ── UI Helpers ─────────────────────────────────────────────────
         private TextBlock CreateCell(string text, string hexColor, FontWeight weight, int col)
         {
             var tb = new TextBlock
             {
                 Text = text,
-                FontSize = 13,
+                FontSize = 12,
                 FontWeight = weight,
                 Foreground = GetColor(hexColor),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -234,19 +252,24 @@ namespace Dental_Clinic_System.Dashboard
                 bg = new SolidColorBrush(Color.FromRgb(0xFE, 0xE2, 0xE2));
                 fg = new SolidColorBrush(Color.FromRgb(0x99, 0x1B, 0x1B));
             }
+            else if (status == "Completed")
+            {
+                bg = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB));
+                fg = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80));
+            }
 
             Border badge = new Border
             {
                 Background = bg,
-                CornerRadius = new CornerRadius(12),
-                Padding = new Thickness(10, 4, 10, 4),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(8, 3, 8, 3),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             };
             badge.Child = new TextBlock
             {
                 Text = status,
-                FontSize = 11,
+                FontSize = 10,
                 FontWeight = FontWeights.SemiBold,
                 Foreground = fg
             };
@@ -272,7 +295,6 @@ namespace Dental_Clinic_System.Dashboard
             return d;
         }
 
-        // ── Events ─────────────────────────────────────────────────────
         private void AddAppointment_Click(object sender, RoutedEventArgs e)
         {
             if (new AppointmentFormWindow().ShowDialog() == true) LoadAppointments();
@@ -280,7 +302,156 @@ namespace Dental_Clinic_System.Dashboard
 
         private void EditAppointment_Click(AppointmentItem apt)
         {
-            if (new AppointmentFormWindow(apt).ShowDialog() == true) LoadAppointments();
+            var detachedCopy = new AppointmentItem
+            {
+                AppointmentId = apt.AppointmentId,
+                PatientName = apt.PatientName,
+                Dentist = apt.Dentist,
+                Service = apt.Service,
+                Date = apt.Date,
+                Time = apt.Time,
+                Status = apt.Status,
+                IsCompleted = apt.IsCompleted,
+                CompletionDate = apt.CompletionDate,
+                CompletionNotes = apt.CompletionNotes
+            };
+
+            if (new AppointmentFormWindow(detachedCopy).ShowDialog() == true)
+                LoadAppointments();
+        }
+
+        private void CompleteAppointment_Click(AppointmentItem apt)
+        {
+            Window completionWindow = new Window
+            {
+                Title = "Complete Appointment",
+                Width = 500,
+                Height = 400,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Background = Brushes.White,
+                WindowStyle = WindowStyle.SingleBorderWindow,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            StackPanel sp = new StackPanel { Margin = new Thickness(20) };
+
+            sp.Children.Add(new TextBlock
+            {
+                Text = "Complete Appointment",
+                FontSize = 18,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 0, 0, 15),
+                Foreground = new SolidColorBrush(Color.FromRgb(0x11, 0x18, 0x27))
+            });
+
+            sp.Children.Add(new TextBlock { Text = "Appointment Details:", FontSize = 12, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
+            sp.Children.Add(new TextBlock { Text = $"Patient: {apt.PatientName}", FontSize = 11, Margin = new Thickness(0, 0, 0, 4), Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)) });
+            sp.Children.Add(new TextBlock { Text = $"Dentist: {apt.Dentist}", FontSize = 11, Margin = new Thickness(0, 0, 0, 4), Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)) });
+            sp.Children.Add(new TextBlock { Text = $"Service: {apt.Service}", FontSize = 11, Margin = new Thickness(0, 0, 0, 15), Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)) });
+
+            sp.Children.Add(new TextBlock { Text = "Diagnosis:", FontSize = 12, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
+            TextBox diagnosisBox = new TextBox
+            {
+                Height = 50,
+                Padding = new Thickness(10),
+                BorderThickness = new Thickness(1),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB)),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 15),
+                FontSize = 12
+            };
+            sp.Children.Add(diagnosisBox);
+
+            sp.Children.Add(new TextBlock { Text = "Treatment Notes:", FontSize = 12, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
+            TextBox notesBox = new TextBox
+            {
+                Height = 60,
+                Padding = new Thickness(10),
+                BorderThickness = new Thickness(1),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB)),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 15),
+                FontSize = 12,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+            sp.Children.Add(notesBox);
+
+            StackPanel buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 15, 0, 0) };
+
+            Button cancelBtn = new Button
+            {
+                Content = "Cancel",
+                Width = 80,
+                Height = 35,
+                Margin = new Thickness(0, 0, 10, 0),
+                Background = Brushes.White,
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB)),
+                BorderThickness = new Thickness(1),
+                FontSize = 12
+            };
+            cancelBtn.Click += (s, e) => completionWindow.Close();
+            buttonPanel.Children.Add(cancelBtn);
+
+            Button completeBtn = new Button
+            {
+                Content = "✓ Complete",
+                Width = 120,
+                Height = 35,
+                Background = new SolidColorBrush(Color.FromRgb(0x06, 0x5F, 0x46)),
+                Foreground = Brushes.White,
+                BorderThickness = new Thickness(0),
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold,
+                Cursor = Cursors.Hand
+            };
+            completeBtn.Click += (s, e) =>
+            {
+                CompleteAppointmentAndAddToHistory(apt, diagnosisBox.Text, notesBox.Text);
+                completionWindow.Close();
+            };
+            buttonPanel.Children.Add(completeBtn);
+
+            sp.Children.Add(buttonPanel);
+
+            ScrollViewer scroll = new ScrollViewer { Content = sp, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            completionWindow.Content = scroll;
+            completionWindow.ShowDialog();
+        }
+
+        private void CompleteAppointmentAndAddToHistory(AppointmentItem apt, string diagnosis, string notes)
+        {
+            using (var db = new AppDbContext())
+            {
+                apt.IsCompleted = true;
+                apt.CompletionDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                apt.CompletionNotes = notes;
+                apt.Status = "Completed";
+
+                db.Appointments.Update(apt);
+
+                var patient = db.Patients.FirstOrDefault(p => p.Name == apt.PatientName);
+
+                var historyEntry = new DentalHistoryItem
+                {
+                    PatientId = patient?.PatientId ?? "UNKNOWN",
+                    PatientName = apt.PatientName,
+                    AppointmentDate = apt.Date,
+                    AppointmentTime = apt.Time,
+                    Service = apt.Service,
+                    Dentist = apt.Dentist,
+                    TreatmentNotes = notes,
+                    Diagnosis = diagnosis,
+                    TreatmentOutcome = "Completed",
+                    DateCreated = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                };
+
+                db.DentalHistory.Add(historyEntry);
+                db.SaveChanges();
+            }
+
+            MessageBox.Show($"✓ Appointment completed!\n\nAdded to {apt.PatientName}'s dental history.",
+                "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            LoadAppointments();
         }
 
         private void RemoveAppointment_Click(AppointmentItem apt)
@@ -349,17 +520,18 @@ namespace Dental_Clinic_System.Dashboard
             }
         }
 
-        // Search
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (SearchBox.Text == "Search patient...")
             { SearchBox.Text = ""; SearchBox.Foreground = Brushes.Black; }
         }
+
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(SearchBox.Text))
             { SearchBox.Text = "Search patient..."; SearchBox.Foreground = Brushes.Gray; currentSearch = ""; LoadAppointments(); }
         }
+
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (SearchBox.Text != "Search patient...") { currentSearch = SearchBox.Text; LoadAppointments(); }

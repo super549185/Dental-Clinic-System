@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dental_Clinic_System.Models;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,6 +33,7 @@ namespace Dental_Clinic_System.Dashboard
                     case "Clinic": ShowClinicPanel(); break;
                     case "Account": ShowAccountPanel(); break;
                     case "Appointments": ShowAppointmentsPanel(); break;
+                    case "Archive": ShowArchivePatientsPanel(); break;
                     case "Notifications": ShowNotificationsPanel(); break;
                     case "Database": ShowDatabasePanel(); break;
                     case "Guide": ShowGuidePanel(); break;
@@ -751,6 +753,164 @@ namespace Dental_Clinic_System.Dashboard
                 return new SolidColorBrush(Color.FromRgb(r, g, b));
             }
             catch { return Brushes.Gray; }
+        }
+        // Add this new method to show archived patients
+
+        private void ShowArchivePatientsPanel()
+        {
+            SettingsContent.Children.Clear();
+            SettingsContent.Children.Add(MakeSectionHeader("📦", "Archived Patients",
+                "Manage deleted/archived patient records."));
+
+            using (var db = new Data.AppDbContext())
+            {
+                var archivedPatients = db.Patients.Where(p => p.IsArchived).ToList();
+
+                if (archivedPatients.Count == 0)
+                {
+                    SettingsContent.Children.Add(MakeInfoBox("No archived patients yet."));
+                    return;
+                }
+
+                var card = MakeCard();
+                var sp = new StackPanel();
+
+                foreach (var patient in archivedPatients)
+                {
+                    // Create patient row
+                    Border patientRow = new Border
+                    {
+                        Height = 60,
+                        Background = Brushes.White,
+                        BorderBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0xF4, 0xF6)),
+                        BorderThickness = new Thickness(0, 0, 0, 1),
+                        Padding = new Thickness(15, 10, 15, 10),
+                        Margin = new Thickness(0, 0, 0, 5)
+                    };
+
+                    Grid grid = new Grid();
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    // Patient info
+                    StackPanel info = new StackPanel();
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = patient.Name,
+                        FontSize = 14,
+                        FontWeight = FontWeights.SemiBold,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x11, 0x18, 0x27))
+                    });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = $"Archived: {patient.ArchiveDate} | Reason: {patient.ArchiveReason}",
+                        FontSize = 11,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x9C, 0xA3, 0xAF)),
+                        Margin = new Thickness(0, 4, 0, 0)
+                    });
+                    grid.Children.Add(info);
+
+                    // Restore Button
+                    Button restoreBtn = new Button
+                    {
+                        Content = "↩️  Restore",
+                        Background = new SolidColorBrush(Color.FromRgb(0x06, 0x5F, 0x46)),
+                        Foreground = Brushes.White,
+                        BorderThickness = new Thickness(0),
+                        FontSize = 12,
+                        Padding = new Thickness(10, 6, 10, 6),
+                        Cursor = Cursors.Hand,
+                        Margin = new Thickness(10, 0, 0, 0)
+                    };
+                    restoreBtn.Click += (s, e) => RestorePatient(patient);
+                    Grid.SetColumn(restoreBtn, 1);
+                    grid.Children.Add(restoreBtn);
+
+                    // Delete Button (Permanent)
+                    Button deleteBtn = new Button
+                    {
+                        Content = "🗑️  Delete",
+                        Background = new SolidColorBrush(Color.FromRgb(0xEF, 0x44, 0x44)),
+                        Foreground = Brushes.White,
+                        BorderThickness = new Thickness(0),
+                        FontSize = 12,
+                        Padding = new Thickness(10, 6, 10, 6),
+                        Cursor = Cursors.Hand,
+                        Margin = new Thickness(5, 0, 0, 0)
+                    };
+                    deleteBtn.Click += (s, e) => PermanentlyDeletePatient(patient);
+                    Grid.SetColumn(deleteBtn, 2);
+                    grid.Children.Add(deleteBtn);
+
+                    patientRow.Child = grid;
+                    sp.Children.Add(patientRow);
+                }
+
+                card.Child = sp;
+                SettingsContent.Children.Add(card);
+            }
+        }
+
+        private void RestorePatient(PatientItem patient)
+        {
+            var result = MessageBox.Show(
+                $"Restore patient: {patient.Name}?",
+                "Restore Patient",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                patient.IsArchived = false;
+                patient.ArchiveDate = null;
+                patient.ArchiveReason = null;
+
+                using (var db = new Data.AppDbContext())
+                {
+                    db.Patients.Update(patient);
+                    db.SaveChanges();
+                }
+
+                MessageBox.Show("Patient restored successfully!", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowArchivePatientsPanel();  // Refresh
+            }
+        }
+
+        private void PermanentlyDeletePatient(PatientItem patient)
+        {
+            var result = MessageBox.Show(
+                $"⚠️  Permanently delete patient: {patient.Name}?\n\n" +
+                "This cannot be undone and will also delete:\n" +
+                "- All their appointments\n" +
+                "- All their dental history\n\n" +
+                "Continue?",
+                "Permanent Delete",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                using (var db = new Data.AppDbContext())
+                {
+                    // Delete all dental history
+                    var history = db.DentalHistory.Where(h => h.PatientId == patient.PatientId).ToList();
+                    db.DentalHistory.RemoveRange(history);
+
+                    // Delete all appointments
+                    var appointments = db.Appointments.Where(a => a.PatientName == patient.Name).ToList();
+                    db.Appointments.RemoveRange(appointments);
+
+                    // Delete the patient
+                    db.Patients.Remove(patient);
+                    db.SaveChanges();
+                }
+
+                MessageBox.Show("Patient permanently deleted!", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ShowArchivePatientsPanel();  // Refresh
+            }
         }
     }
 }

@@ -76,67 +76,71 @@ namespace Dental_Clinic_System.Dashboard
             }
 
             // Dental History (Past Appointments)
-            var history = appointments.Where(a => a.Date.CompareTo(todayStr) < 0).OrderByDescending(a => a.Date).ToList();
+            // Dental History (Past Appointments + Custom History)
+            var history = _dbContext.Appointments.Where(a => a.PatientName == _patient.Name && a.Date.CompareTo(todayStr) < 0).OrderByDescending(a => a.Date).ToList();
+            var customHistory = _dbContext.DentalHistory.Where(h => h.PatientId == _patient.PatientId).OrderByDescending(h => h.DateCreated).ToList();
+
             HistoryPanel.Children.Clear();
-            if (!history.Any())
+
+            if (!history.Any() && !customHistory.Any())
             {
                 HistoryPanel.Children.Add(new TextBlock
                 {
-                    Text = "No past history available.",
+                    Text = "No dental history available.",
                     FontSize = 13,
                     Foreground = new SolidColorBrush(Color.FromRgb(0x9C, 0xA3, 0xAF))
                 });
             }
-
-            int i = 0;
-            foreach (var apt in history)
+            else
             {
-                Border row = new Border
+                // Show custom dental history entries first
+                int i = 0;
+                foreach (var entry in customHistory)
                 {
-                    Height = 35,
-                    Background = i % 2 == 0 ? Brushes.White : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
-                    CornerRadius = new CornerRadius(4),
-                    Margin = new Thickness(0, 0, 0, 2)
-                };
+                    Border row = new Border
+                    {
+                        Height = 80,
+                        Background = i % 2 == 0 ? Brushes.White : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB)),
+                        BorderBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB)),
+                        BorderThickness = new Thickness(0, 0, 0, 1),
+                        Padding = new Thickness(12, 8, 12, 8),
+                        Margin = new Thickness(0, 0, 0, 5)
+                    };
 
-                Grid g = new Grid { Margin = new Thickness(10, 0, 0, 0) };
-                g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });
-                g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80, GridUnitType.Pixel) });
+                    StackPanel info = new StackPanel();
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = $"{entry.Service} | {entry.Dentist}",
+                        FontSize = 12,
+                        FontWeight = FontWeights.SemiBold,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x11, 0x18, 0x27))
+                    });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = $"Date: {FormatDate(entry.AppointmentDate)} at {entry.AppointmentTime}",
+                        FontSize = 11,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)),
+                        Margin = new Thickness(0, 4, 0, 0)
+                    });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = $"Diagnosis: {entry.Diagnosis}",
+                        FontSize = 10,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x4B, 0x55, 0x63)),
+                        Margin = new Thickness(0, 2, 0, 0)
+                    });
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = $"Notes: {entry.TreatmentNotes}",
+                        FontSize = 10,
+                        Foreground = new SolidColorBrush(Color.FromRgb(0x4B, 0x55, 0x63)),
+                        Margin = new Thickness(0, 2, 0, 0)
+                    });
 
-                // FIXED: Removed quotes from FontSize and FontWeight
-                g.Children.Add(new TextBlock
-                {
-                    Text = FormatDate(apt.Date),
-                    FontSize = 12,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x4B, 0x55, 0x63)),
-                    VerticalAlignment = VerticalAlignment.Center
-                });
-
-                TextBlock serv = new TextBlock
-                {
-                    Text = apt.Service,
-                    FontSize = 12,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x11, 0x18, 0x27)),
-                    FontWeight = FontWeights.Medium,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(serv, 1);
-                g.Children.Add(serv);
-
-                TextBlock doc = new TextBlock
-                {
-                    Text = apt.Dentist,
-                    FontSize = 12,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(doc, 2);
-                g.Children.Add(doc);
-
-                row.Child = g;
-                HistoryPanel.Children.Add(row);
-                i++;
+                    row.Child = info;
+                    HistoryPanel.Children.Add(row);
+                    i++;
+                }
             }
         }
 

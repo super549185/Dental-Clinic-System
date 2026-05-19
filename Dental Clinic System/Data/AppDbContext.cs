@@ -10,11 +10,13 @@ namespace Dental_Clinic_System.Data
         public DbSet<ServiceItem> Services { get; set; }
         public DbSet<InventoryItem> Inventory { get; set; }
         public DbSet<StaffItem> Staff { get; set; }
+        public DbSet<DentalHistoryItem> DentalHistory { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=DentalClinic.db");
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StaffItem>().Property(s => s.ImageData)

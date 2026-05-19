@@ -39,13 +39,14 @@ namespace Dental_Clinic_System.Dashboard
         }
 
         private void LoadPatients()
-        {      
+        {
             _dbContext.Dispose();
             _dbContext = new AppDbContext();
             _dbContext.Database.EnsureCreated();
 
             PatientList.Children.Clear();
-            var patients = _dbContext.Patients.ToList();
+            // ✅ FILTER: Only show non-archived patients
+            var patients = _dbContext.Patients.Where(p => !p.IsArchived).ToList();
 
             if (!string.IsNullOrEmpty(currentSearch) && currentSearch != "Search patient...")
             {
@@ -134,17 +135,31 @@ namespace Dental_Clinic_System.Dashboard
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) { if (SearchBox.Text != "Search patient...") { currentSearch = SearchBox.Text; LoadPatients(); } }
 
         // --- Actions ---
-        // --- Actions ---
         private void AddPatient_Click(object sender, RoutedEventArgs e) { if (new PatientFormWindow().ShowDialog() == true) LoadPatients(); }
         private void ViewProfile_Click(PatientItem p) { new PatientProfileWindow(p).ShowDialog(); LoadPatients(); }
 
+        // ✅ UPDATED: RemovePatient_Click now archives instead of deleting
         private void RemovePatient_Click(PatientItem p)
         {
-            MessageBoxResult result = MessageBox.Show($"Are you sure you want to delete patient {p.PatientId}?\n\nThis action cannot be undone.", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show(
+                $"Archive patient: {p.Name}?\n\n" +
+                "This will move them to the archived section.\n" +
+                "You can restore them later from Settings.",
+                "Archive Patient",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
             if (result == MessageBoxResult.Yes)
             {
-                _dbContext.Patients.Remove(p);
+                p.IsArchived = true;
+                p.ArchiveDate = DateTime.Now.ToString("yyyy-MM-dd");
+                p.ArchiveReason = "Deleted from patient list";
+
+                _dbContext.Patients.Update(p);
                 _dbContext.SaveChanges();
+
+                MessageBox.Show("Patient archived successfully!", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadPatients();
             }
         }

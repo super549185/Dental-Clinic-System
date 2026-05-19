@@ -17,5 +17,8 @@ namespace Dental_Clinic_System.Models
         public string Allergies { get; set; }
         public string MedicalConditions { get; set; }
         public string BloodType { get; set; }
+        public bool IsArchived { get; set; } = false;
+        public string? ArchiveDate { get; set; }
+        public string? ArchiveReason { get; set; }
     }
 }

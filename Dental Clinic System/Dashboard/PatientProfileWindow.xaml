@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Dental_Clinic_System.Dashboard.PatientProfileWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Patient Profile" Height="650" Width="900"
+        Title="Patient Profile" Height="750" Width="900"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Background="#F3F4F6" WindowStyle="None" AllowsTransparency="True">
 
@@ -163,24 +163,27 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Dental History Card -->
+                    <!-- ✅ ENHANCED: Dental History Card with Diagnosis & Notes -->
                     <Border Background="White" CornerRadius="8" Padding="20">
                         <StackPanel>
                             <TextBlock Text="Dental History" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
 
+                            <!-- Column Headers -->
                             <Border Background="#F9FAFB" Height="35" CornerRadius="4" Margin="0,0,0,5">
                                 <Grid Margin="10,0">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80"/>
                                         <ColumnDefinition Width="90"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="80"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Date" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="1" Text="Treatment" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="Dentist" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Service" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="Notes" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
-                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+
+                            <!-- History Items Scroll -->
+                            <ScrollViewer MaxHeight="280" VerticalScrollBarVisibility="Auto">
                                 <StackPanel x:Name="HistoryPanel"/>
                             </ScrollViewer>
                         </StackPanel>
