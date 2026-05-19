@@ -90,7 +90,6 @@
                     <ListBoxItem Content="Billing"/>
                     <ListBoxItem Content="Notifications"/>
                     <ListBoxItem Content="Inventory"/>
-                    <ListBoxItem Content="Reports"/>
                     <ListBoxItem Content="Settings"/>
                 </ListBox>
 

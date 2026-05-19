@@ -17,9 +17,7 @@ namespace Dental_Clinic_System.Dashboard
         private void SidebarMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SidebarMenu.SelectedItem is ListBoxItem item)
-            {
                 LoadPage(item.Content.ToString());
-            }
         }
 
         private void LoadPage(string pageName)
@@ -29,44 +27,49 @@ namespace Dental_Clinic_System.Dashboard
             Grid contentGrid = (Grid)contentBorder.Child;
             contentGrid.Children.Clear();
 
+            Frame frame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
+
             switch (pageName)
             {
                 case "Dashboard":
-                    Frame dashFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    dashFrame.Navigate(new DashboardPage()); // LOAD NEW DASHBOARD
-                    contentGrid.Children.Add(dashFrame);
+                    frame.Navigate(new DashboardPage());
+                    contentGrid.Children.Add(frame);
                     break;
 
                 case "Appointments":
-                    Frame aptFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    aptFrame.Navigate(new AppointmentPage());
-                    contentGrid.Children.Add(aptFrame);
+                    frame.Navigate(new AppointmentPage());
+                    contentGrid.Children.Add(frame);
                     break;
+
                 case "Patients":
-                    Frame patFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    patFrame.Navigate(new PatientPage());
-                    contentGrid.Children.Add(patFrame);
+                    frame.Navigate(new PatientPage());
+                    contentGrid.Children.Add(frame);
                     break;
+
                 case "Services":
-                    Frame servFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    servFrame.Navigate(new ServicePage());
-                    contentGrid.Children.Add(servFrame);
+                    frame.Navigate(new ServicePage());
+                    contentGrid.Children.Add(frame);
                     break;
+
                 case "Inventory":
-                    Frame invFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    invFrame.Navigate(new InventoryPage());
-                    contentGrid.Children.Add(invFrame);
+                    frame.Navigate(new InventoryPage());
+                    contentGrid.Children.Add(frame);
                     break;
+
                 case "Dentists & Staff":
-                    Frame staffFrame = new Frame { NavigationUIVisibility = NavigationUIVisibility.Hidden };
-                    staffFrame.Navigate(new StaffPage());
-                    contentGrid.Children.Add(staffFrame);
+                    frame.Navigate(new StaffPage());
+                    contentGrid.Children.Add(frame);
+                    break;
+
+                case "Settings":
+                    frame.Navigate(new SettingsPage());
+                    contentGrid.Children.Add(frame);
                     break;
 
                 default:
                     TextBlock comingSoon = new TextBlock
                     {
-                        Text = $"{pageName} - Coming Soon",
+                        Text = $"{pageName} — Coming Soon",
                         FontSize = 24,
                         FontWeight = FontWeights.Bold,
                         Foreground = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)),
@@ -80,7 +83,10 @@ namespace Dental_Clinic_System.Dashboard
 
         private void logoutButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to logout?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = MessageBox.Show(
+                "Are you sure you want to logout?",
+                "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
             if (result == MessageBoxResult.Yes)
             {
                 MainWindow mainWindow = new MainWindow();
