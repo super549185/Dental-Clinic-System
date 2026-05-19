@@ -1,5 +1,7 @@
 ﻿using Dental_Clinic_System.Models;
 using System;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -241,10 +243,11 @@ namespace Dental_Clinic_System.Dashboard
 
             sp.Children.Add(new TextBlock
             {
-                Text = "Current database: DentalClinic.db",
-                FontSize = 13,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x4B, 0x55, 0x63)),
-                Margin = new Thickness(0, 0, 0, 15)
+                Text = $"Current database location:\n{GetDbPath()}",
+                FontSize = 12,
+                Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80)),
+                Margin = new Thickness(0, 0, 0, 15),
+                TextWrapping = TextWrapping.Wrap
             });
 
             var btnRow = new StackPanel { Orientation = Orientation.Horizontal };
@@ -365,8 +368,19 @@ namespace Dental_Clinic_System.Dashboard
         }
 
         // ─────────────────────────────────────────────────────────────
-        // BUTTON HANDLERS (stubs — wire up real logic as needed)
+        // ★ FIXED: DATABASE PATH HELPER & BUTTON HANDLERS
         // ─────────────────────────────────────────────────────────────
+
+        // Matches the exact path used in AppDbContext.cs
+        private string GetDbPath()
+        {
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Dental_Clinic_System");
+            Directory.CreateDirectory(folder);
+            return Path.Combine(folder, "DentalClinic.db");
+        }
+
         private void ExportBackup_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new Microsoft.Win32.SaveFileDialog
@@ -379,7 +393,10 @@ namespace Dental_Clinic_System.Dashboard
             {
                 try
                 {
-                    System.IO.File.Copy("DentalClinic.db", dlg.FileName, overwrite: true);
+                    // Force close any open connections before copying
+                    Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
+                    System.IO.File.Copy(GetDbPath(), dlg.FileName, overwrite: true);
                     MessageBox.Show("Backup exported successfully!", "Success",
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -408,8 +425,28 @@ namespace Dental_Clinic_System.Dashboard
                 {
                     try
                     {
-                        System.IO.File.Copy(dlg.FileName, "DentalClinic.db", overwrite: true);
-                        MessageBox.Show("Backup restored! Please restart the application.",
+                        string targetDb = GetDbPath();
+
+                        // ★ CRITICAL: Force close all SQLite connections so the file isn't locked
+                        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
+                        // Delete the old database completely to ensure a clean swap
+                        if (System.IO.File.Exists(targetDb))
+                        {
+                            System.IO.File.Delete(targetDb);
+                        }
+
+                        // Copy the backup in
+                        System.IO.File.Copy(dlg.FileName, targetDb);
+
+                        // Delete the seed flag so imported data loads without crashing
+                        string flagFile = Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                            "Dental_Clinic_System", "seeded.flag");
+                        if (System.IO.File.Exists(flagFile))
+                            System.IO.File.Delete(flagFile);
+
+                        MessageBox.Show("Backup restored successfully! Please close and restart the application.",
                             "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
@@ -440,10 +477,19 @@ namespace Dental_Clinic_System.Dashboard
                         db.Staff.RemoveRange(db.Staff);
                         db.Inventory.RemoveRange(db.Inventory);
                         db.Services.RemoveRange(db.Services);
+                        db.DentalHistory.RemoveRange(db.DentalHistory);
                         db.SaveChanges();
                     }
+
+                    // ★ FIXED: Clear the seed flag so appointments re-appear on a true reset
+                    string flagFile = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "Dental_Clinic_System", "seeded.flag");
+                    if (File.Exists(flagFile)) File.Delete(flagFile);
+
                     MessageBox.Show("All data has been reset. The system will now restart.",
                         "Reset Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+
                     // Restart
                     System.Windows.Application.Current.Shutdown();
                     System.Diagnostics.Process.Start(
@@ -496,7 +542,6 @@ namespace Dental_Clinic_System.Dashboard
             };
         }
 
-        /// <summary>Numbered step-by-step guide card.</summary>
         private Border MakeStepGuide((string label, string desc)[] steps)
         {
             var sp = new StackPanel { Margin = new Thickness(0, 0, 0, 4) };
@@ -507,7 +552,6 @@ namespace Dental_Clinic_System.Dashboard
                 row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(32) });
                 row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                // Numbered circle
                 Border circle = new Border
                 {
                     Width = 26,
@@ -528,7 +572,6 @@ namespace Dental_Clinic_System.Dashboard
                 };
                 row.Children.Add(circle);
 
-                // Text
                 var textSp = new StackPanel { Margin = new Thickness(8, 0, 0, 0) };
                 textSp.Children.Add(new TextBlock
                 {
@@ -604,7 +647,6 @@ namespace Dental_Clinic_System.Dashboard
             Margin = new Thickness(0, 4, 0, 4)
         };
 
-        // Labeled two-column form field inside a Grid
         private void AddLabeledField(Grid grid, string label, string placeholder,
             int row, int col, int colSpan = 1)
         {
@@ -670,7 +712,6 @@ namespace Dental_Clinic_System.Dashboard
                 VerticalAlignment = VerticalAlignment.Center
             });
 
-            // Simple on/off toggle pill
             Border toggle = new Border
             {
                 Width = 44,
@@ -719,8 +760,7 @@ namespace Dental_Clinic_System.Dashboard
             return btn;
         }
 
-        private Button MakeActionButton(string label, string bgHex, string hoverHex,
-            RoutedEventHandler handler)
+        private Button MakeActionButton(string label, string bgHex, string hoverHex, RoutedEventHandler handler)
         {
             var bg = HexBrush(bgHex);
             var hover = HexBrush(hoverHex);
@@ -754,7 +794,6 @@ namespace Dental_Clinic_System.Dashboard
             }
             catch { return Brushes.Gray; }
         }
-        // Add this new method to show archived patients
 
         private void ShowArchivePatientsPanel()
         {
@@ -777,7 +816,6 @@ namespace Dental_Clinic_System.Dashboard
 
                 foreach (var patient in archivedPatients)
                 {
-                    // Create patient row
                     Border patientRow = new Border
                     {
                         Height = 60,
@@ -793,7 +831,6 @@ namespace Dental_Clinic_System.Dashboard
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-                    // Patient info
                     StackPanel info = new StackPanel();
                     info.Children.Add(new TextBlock
                     {
@@ -811,7 +848,6 @@ namespace Dental_Clinic_System.Dashboard
                     });
                     grid.Children.Add(info);
 
-                    // Restore Button
                     Button restoreBtn = new Button
                     {
                         Content = "↩️  Restore",
@@ -827,7 +863,6 @@ namespace Dental_Clinic_System.Dashboard
                     Grid.SetColumn(restoreBtn, 1);
                     grid.Children.Add(restoreBtn);
 
-                    // Delete Button (Permanent)
                     Button deleteBtn = new Button
                     {
                         Content = "🗑️  Delete",
@@ -855,10 +890,8 @@ namespace Dental_Clinic_System.Dashboard
         private void RestorePatient(PatientItem patient)
         {
             var result = MessageBox.Show(
-                $"Restore patient: {patient.Name}?",
-                "Restore Patient",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                $"Restore patient: {patient.Name}?", "Restore Patient",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -874,7 +907,7 @@ namespace Dental_Clinic_System.Dashboard
 
                 MessageBox.Show("Patient restored successfully!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
-                ShowArchivePatientsPanel();  // Refresh
+                ShowArchivePatientsPanel();
             }
         }
 
@@ -885,31 +918,26 @@ namespace Dental_Clinic_System.Dashboard
                 "This cannot be undone and will also delete:\n" +
                 "- All their appointments\n" +
                 "- All their dental history\n\n" +
-                "Continue?",
-                "Permanent Delete",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+                "Continue?", "Permanent Delete",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
                 using (var db = new Data.AppDbContext())
                 {
-                    // Delete all dental history
                     var history = db.DentalHistory.Where(h => h.PatientId == patient.PatientId).ToList();
                     db.DentalHistory.RemoveRange(history);
 
-                    // Delete all appointments
                     var appointments = db.Appointments.Where(a => a.PatientName == patient.Name).ToList();
                     db.Appointments.RemoveRange(appointments);
 
-                    // Delete the patient
                     db.Patients.Remove(patient);
                     db.SaveChanges();
                 }
 
                 MessageBox.Show("Patient permanently deleted!", "Success",
                     MessageBoxButton.OK, MessageBoxImage.Information);
-                ShowArchivePatientsPanel();  // Refresh
+                ShowArchivePatientsPanel();
             }
         }
     }

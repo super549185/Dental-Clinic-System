@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.IO;
+using Microsoft.EntityFrameworkCore;
 using Dental_Clinic_System.Models;
 
 namespace Dental_Clinic_System.Data
@@ -14,7 +16,16 @@ namespace Dental_Clinic_System.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=DentalClinic.db");
+            // Save database to AppData so Visual Studio never overwrites it
+            string folder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Dental_Clinic_System");
+
+            Directory.CreateDirectory(folder);
+
+            string dbPath = Path.Combine(folder, "DentalClinic.db");
+
+            optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

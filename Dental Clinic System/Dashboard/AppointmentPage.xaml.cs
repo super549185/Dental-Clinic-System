@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO; // ★ ADDED FOR SEED FLAG
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,31 +29,56 @@ namespace Dental_Clinic_System.Dashboard
 
         private void SeedDatabase()
         {
-            if (!_dbContext.Appointments.Any())
+            string appDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Dental_Clinic_System");
+
+            string flagFile = Path.Combine(appDataFolder, "seeded.flag");
+
+            // 1. If flag exists, skip completely (prevents re-seeding after deletions)
+            if (File.Exists(flagFile))
+                return;
+
+            var seedIds = new[] { "APT001", "APT002", "APT003", "APT004", "APT005" };
+
+            // 2. If these IDs exist (e.g., imported backup), create flag and exit
+            if (_dbContext.Appointments.Any(a => seedIds.Contains(a.AppointmentId)))
             {
-                using (var db = new AppDbContext())
-                {
-                    string todayStr = DateTime.Today.ToString("yyyy-MM-dd");
-                    var services = db.Services.Select(s => s.Name).ToList();
-                    var dentists = db.Staff.Where(s => s.Role == "Dentist").Select(s => s.Name).ToList();
-                    if (!services.Any() || !dentists.Any()) return;
-
-                    List<string> validTimes = new List<string>();
-                    for (int hour = 8; hour <= 17; hour++)
-                        validTimes.Add(DateTime.Today.AddHours(hour).ToString("hh:mm tt"));
-
-                    Random rnd = new Random();
-                    _dbContext.Appointments.AddRange(new List<AppointmentItem>
-                    {
-                        new AppointmentItem { AppointmentId = "APT001", PatientName = "Gilbert Torres",     Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[0], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT002", PatientName = "Richfield Bernaldez",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[1], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT003", PatientName = "Jerfel Maamo", Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[2], Status = "Confirmed" },
-                        new AppointmentItem { AppointmentId = "APT004", PatientName = "Angelo Macalibo",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-05",  Time = validTimes[3], Status = "Cancelled" },
-                        new AppointmentItem { AppointmentId = "APT005", PatientName = "Jay-Al Gallenero",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-06",  Time = validTimes[4], Status = "Cancelled" }
-                    });
-                }
-                _dbContext.SaveChanges();
+                Directory.CreateDirectory(appDataFolder);
+                File.WriteAllText(flagFile, "Seeded on " + DateTime.Now.ToString());
+                return;
             }
+
+            // 3. Fresh DB: Try to seed only if Services and Dentists exist
+            string todayStr = DateTime.Today.ToString("yyyy-MM-dd");
+            var services = _dbContext.Services.Select(s => s.Name).ToList();
+            var dentists = _dbContext.Staff.Where(s => s.Role == "Dentist").Select(s => s.Name).ToList();
+
+            bool canSeed = services.Any() && dentists.Any();
+
+            if (canSeed)
+            {
+                List<string> validTimes = new List<string>();
+                for (int hour = 8; hour <= 17; hour++)
+                    validTimes.Add(DateTime.Today.AddHours(hour).ToString("hh:mm tt"));
+
+                Random rnd = new Random();
+                _dbContext.Appointments.AddRange(new List<AppointmentItem>
+        {
+            new AppointmentItem { AppointmentId = "APT001", PatientName = "Gilbert Torres",     Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[0], Status = "Confirmed" },
+            new AppointmentItem { AppointmentId = "APT002", PatientName = "Richfield Bernaldez",  Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[1], Status = "Confirmed" },
+            new AppointmentItem { AppointmentId = "APT003", PatientName = "Jerfel Maamo",        Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = todayStr,      Time = validTimes[2], Status = "Confirmed" },
+            new AppointmentItem { AppointmentId = "APT004", PatientName = "Angelo Macalibo",     Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-05",  Time = validTimes[3], Status = "Cancelled" },
+            new AppointmentItem { AppointmentId = "APT005", PatientName = "Jay-Al Gallenero",    Dentist = dentists[rnd.Next(dentists.Count)], Service = services[rnd.Next(services.Count)], Date = "2026-02-06",  Time = validTimes[4], Status = "Cancelled" }
+        });
+
+                _dbContext.SaveChanges();
+
+                
+                Directory.CreateDirectory(appDataFolder);
+                File.WriteAllText(flagFile, "Seeded on " + DateTime.Now.ToString());
+            }
+           
         }
 
         private void LoadAppointments()
@@ -111,13 +137,13 @@ namespace Dental_Clinic_System.Dashboard
                 : new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB));
 
             Grid grid = new Grid { VerticalAlignment = VerticalAlignment.Center };
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(70, GridUnitType.Pixel) });   // ID
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });      // Patient Name (flexible)
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });    // Dentist
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100, GridUnitType.Pixel) });   // Service
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(115, GridUnitType.Pixel) });   // Date & Time
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85, GridUnitType.Pixel) });    // Status
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });    // Actions
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(70, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(115, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(95, GridUnitType.Pixel) });
 
             grid.Children.Add(CreateCell(apt.AppointmentId, "#6B7280", FontWeights.Normal, 0));
             grid.Children.Add(CreateCell(apt.PatientName, "#111827", FontWeights.SemiBold, 1));
@@ -295,11 +321,6 @@ namespace Dental_Clinic_System.Dashboard
             return d;
         }
 
-        private void AddAppointment_Click(object sender, RoutedEventArgs e)
-        {
-            if (new AppointmentFormWindow().ShowDialog() == true) LoadAppointments();
-        }
-
         private void EditAppointment_Click(AppointmentItem apt)
         {
             var detachedCopy = new AppointmentItem
@@ -318,6 +339,11 @@ namespace Dental_Clinic_System.Dashboard
 
             if (new AppointmentFormWindow(detachedCopy).ShowDialog() == true)
                 LoadAppointments();
+        }
+
+        private void AddAppointment_Click(object sender, RoutedEventArgs e)
+        {
+            if (new AppointmentFormWindow().ShowDialog() == true) LoadAppointments();
         }
 
         private void CompleteAppointment_Click(AppointmentItem apt)
@@ -422,12 +448,15 @@ namespace Dental_Clinic_System.Dashboard
         {
             using (var db = new AppDbContext())
             {
-                apt.IsCompleted = true;
-                apt.CompletionDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-                apt.CompletionNotes = notes;
-                apt.Status = "Completed";
-
-                db.Appointments.Update(apt);
+                // ★ FIXED: Fetch fresh entity instead of using tracked one
+                var trackedEntity = db.Appointments.FirstOrDefault(a => a.AppointmentId == apt.AppointmentId);
+                if (trackedEntity != null)
+                {
+                    trackedEntity.IsCompleted = true;
+                    trackedEntity.CompletionDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                    trackedEntity.CompletionNotes = notes;
+                    trackedEntity.Status = "Completed";
+                }
 
                 var patient = db.Patients.FirstOrDefault(p => p.Name == apt.PatientName);
 

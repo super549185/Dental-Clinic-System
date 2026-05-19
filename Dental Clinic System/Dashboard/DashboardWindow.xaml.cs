@@ -50,6 +50,10 @@ namespace Dental_Clinic_System.Dashboard
                     frame.Navigate(new ServicePage());
                     contentGrid.Children.Add(frame);
                     break;
+                case "Billing":
+                    frame.Navigate(new BillingPage());
+                    contentGrid.Children.Add(frame);
+                    break;
 
                 case "Inventory":
                     frame.Navigate(new InventoryPage());

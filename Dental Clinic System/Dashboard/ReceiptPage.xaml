@@ -1,0 +1,215 @@
+﻿<!-- ReceiptPage.xaml -->
+
+<Page
+    x:Class="Dental_Clinic_System.Dashboard.ReceiptPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="#F5F6F8">
+
+    <Grid Margin="25">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top -->
+        <DockPanel>
+
+            <Button Content="← Back to Invoices"
+                    Width="170"
+                    Height="40"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="#0F766E"
+                    FontWeight="SemiBold"
+                    Click="Back_Click"
+                    DockPanel.Dock="Left"/>
+
+            <Button Content="Download Receipt"
+                    Width="180"
+                    Height="45"
+                    Background="#0F766E"
+                    Foreground="White"
+                    BorderThickness="0"
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Right"/>
+        </DockPanel>
+
+        <!-- Invoice Card -->
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="12"
+                Padding="35"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                Width="900"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+
+            <StackPanel>
+
+                <!-- Header -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="300"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Clinic -->
+                    <StackPanel>
+                        <TextBlock Text="DentaCare Clinic"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="#0F766E"/>
+
+                        <TextBlock Text="123 Medical Center Dr."
+                                   Margin="0,15,0,0"/>
+
+                        <TextBlock Text="City, State 12345"/>
+                        <TextBlock Text="Phone: (555) 000-0000"/>
+                    </StackPanel>
+
+                    <!-- Invoice Info -->
+                    <StackPanel Grid.Column="1"
+                                HorizontalAlignment="Right">
+
+                        <TextBlock Text="INVOICE"
+                                   FontSize="28"
+                                   FontWeight="Bold"/>
+
+                        <TextBlock Text="Invoice #: INV001"
+                                   Margin="0,20,0,0"
+                                   FontSize="16"/>
+
+                        <TextBlock Text="Date: 2025-12-01"
+                                   FontSize="16"/>
+
+                        <TextBlock Text="Due Date: 2025-12-15"
+                                   FontSize="16"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Bill To -->
+                <StackPanel Margin="0,40,0,0">
+
+                    <TextBlock Text="Bill To:"
+                               FontSize="18"
+                               FontWeight="SemiBold"/>
+
+                    <TextBlock Text="John Doe"
+                               Margin="0,15,0,0"/>
+
+                    <TextBlock Text="123 Main St, City"/>
+                    <TextBlock Text="(555) 123-4567"/>
+
+                </StackPanel>
+
+                <!-- Services Table -->
+                <DataGrid Margin="0,35,0,0"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          RowHeight="55"
+                          BorderThickness="0"
+                          GridLinesVisibility="Horizontal">
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn Header="Service"
+                                            Width="*"
+                                            Binding="{Binding Service}"/>
+
+                        <DataGridTextColumn Header="Quantity"
+                                            Width="120"
+                                            Binding="{Binding Quantity}"/>
+
+                        <DataGridTextColumn Header="Price"
+                                            Width="120"
+                                            Binding="{Binding Price}"/>
+
+                        <DataGridTextColumn Header="Total"
+                                            Width="120"
+                                            Binding="{Binding Total}"/>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+                <!-- Totals -->
+                <StackPanel HorizontalAlignment="Right"
+                            Width="250"
+                            Margin="0,30,0,0">
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Subtotal:" FontSize="16"/>
+                        <TextBlock Text="$350"
+                                   Grid.Column="1"
+                                   FontSize="16"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Tax:" FontSize="16"/>
+                        <TextBlock Text="$0"
+                                   Grid.Column="1"
+                                   FontSize="16"/>
+                    </Grid>
+
+                    <Separator Margin="0,5"/>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Total:"
+                                   FontSize="20"
+                                   FontWeight="Bold"/>
+
+                        <TextBlock Text="$350"
+                                   Grid.Column="1"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="#0F766E"/>
+                    </Grid>
+
+                </StackPanel>
+
+                <!-- Footer -->
+                <DockPanel Margin="0,50,0,0">
+
+                    <TextBlock Text="Payment Method: Credit Card"
+                               FontSize="15"
+                               DockPanel.Dock="Left"/>
+
+                    <Border Background="#DCFCE7"
+                            CornerRadius="15"
+                            Padding="20,8"
+                            HorizontalAlignment="Right"
+                            DockPanel.Dock="Right">
+
+                        <TextBlock Text="Paid"
+                                   Foreground="#16A34A"
+                                   FontWeight="Bold"/>
+                    </Border>
+
+                </DockPanel>
+
+            </StackPanel>
+
+        </Border>
+
+    </Grid>
+</Page>
