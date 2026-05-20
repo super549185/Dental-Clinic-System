@@ -39,6 +39,11 @@
                          Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" 
                          FontSize="13" VerticalContentAlignment="Center"/>
 
+                <!-- ADD THIS NEW COMBOBOX HERE -->
+                <ComboBox x:Name="PatientComboBox" Height="38" Padding="10,0" 
+                          Background="#F9FAFB" BorderThickness="1" BorderBrush="#E5E7EB" 
+                          FontSize="13" VerticalContentAlignment="Center" Visibility="Collapsed"/>
+
                 <Border Height="15"/>
 
                 <!-- Dentist -->

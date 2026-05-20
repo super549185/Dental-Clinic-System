@@ -11,7 +11,6 @@ namespace Dental_Clinic_System.Models
         public string Email { get; set; }
         public string LastVisit { get; set; }
         public string Status { get; set; }
-
         public string DateOfBirth { get; set; }
         public string Address { get; set; }
         public string Allergies { get; set; }

@@ -13,8 +13,6 @@ namespace Dental_Clinic_System.Models
         public string Date { get; set; }
         public string Time { get; set; }
         public string Status { get; set; }
-
-        // ✅ NEW: Appointment completion fields
         public string? CompletionNotes { get; set; }
         public string? CompletionDate { get; set; }
         public bool IsCompleted { get; set; } = false;

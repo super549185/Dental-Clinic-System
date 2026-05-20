@@ -12,6 +12,7 @@ namespace Dental_Clinic_System.Dashboard
         private AppDbContext _dbContext;
         private PatientItem _existingPatient;
         private bool isEditMode;
+        public string SavedPatientName { get; private set; }
 
         public PatientFormWindow(PatientItem existingPatient = null)
         {
@@ -62,7 +63,15 @@ namespace Dental_Clinic_System.Dashboard
                     _existingPatient.BloodType = blood;
                     _dbContext.Patients.Update(_existingPatient);
                     _dbContext.SaveChanges();
+                    // ... your existing save code ...
+                  
+
+                    // ADD THIS LINE
+                    SavedPatientName = name;
+
+                    this.DialogResult = true;
                 }
+
                 else
                 {
                     int nextId = _dbContext.Patients.ToList().Select(p => int.Parse(p.PatientId.Substring(1))).DefaultIfEmpty(0).Max() + 1;

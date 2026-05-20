@@ -343,7 +343,29 @@ namespace Dental_Clinic_System.Dashboard
 
         private void AddAppointment_Click(object sender, RoutedEventArgs e)
         {
-            if (new AppointmentFormWindow().ShowDialog() == true) LoadAppointments();
+            // 1. Show the Old/New selection window
+            var selectionWindow = new PatientTypeSelectionWindow();
+
+            if (selectionWindow.ShowDialog() == true)
+            {
+                if (selectionWindow.IsOldPatient)
+                {
+                    // 2a. OLD PATIENT: Open form with ComboBox
+                    if (new AppointmentFormWindow(isOldPatientMode: true).ShowDialog() == true)
+                        LoadAppointments();
+                }
+                else
+                {
+                    // 2b. NEW PATIENT: Open Patient Form first
+                    var patientForm = new PatientFormWindow();
+                    if (patientForm.ShowDialog() == true)
+                    {
+                        // After saving patient, open Appointment form with the new name locked in
+                        if (new AppointmentFormWindow(preselectedNewPatient: patientForm.SavedPatientName).ShowDialog() == true)
+                            LoadAppointments();
+                    }
+                }
+            }
         }
 
         private void CompleteAppointment_Click(AppointmentItem apt)

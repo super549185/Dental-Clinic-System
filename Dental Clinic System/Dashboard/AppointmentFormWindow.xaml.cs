@@ -16,30 +16,57 @@ namespace Dental_Clinic_System.Dashboard
         private bool isEditMode = false;
         private bool _isLoadingData = false;
 
-        public AppointmentFormWindow(AppointmentItem existingAppointment = null)
+        // 1. UPDATED CONSTRUCTOR
+        public AppointmentFormWindow(AppointmentItem existingAppointment = null, bool isOldPatientMode = false, string preselectedNewPatient = null)
         {
             InitializeComponent();
             _dbContext = new AppDbContext();
 
-            // Load dentists FIRST (before generating times, since times depend on selected dentist)
             LoadDentistsFromDatabase();
 
-            if (existingAppointment != null)
+            if (isOldPatientMode)
             {
+                // OLD PATIENT MODE: Hide TextBox, show ComboBox, load patients
+                PatientNameBox.Visibility = Visibility.Collapsed;
+                PatientComboBox.Visibility = Visibility.Visible;
+                LoadPatientsFromDatabase();
+
+                if (DentistBox.Items.Count > 0) DentistBox.SelectedIndex = 0;
+            }
+            else if (!string.IsNullOrEmpty(preselectedNewPatient))
+            {
+                // NEW PATIENT MODE: Show TextBox, make it readonly, fill with new name
+                PatientNameBox.Visibility = Visibility.Visible;
+                PatientComboBox.Visibility = Visibility.Collapsed;
+                PatientNameBox.Text = preselectedNewPatient;
+                PatientNameBox.IsReadOnly = true;
+                PatientNameBox.Background = new SolidColorBrush(Color.FromRgb(0xF3, 0xF4, 0xF6));
+
+                if (DentistBox.Items.Count > 0) DentistBox.SelectedIndex = 0;
+            }
+            else if (existingAppointment != null)
+            {
+                // EDIT MODE: Normal behavior
                 isEditMode = true;
                 _existingAppointment = existingAppointment;
                 FormTitle.Text = "Edit Appointment";
                 LoadData(existingAppointment);
             }
-            else
+        }
+
+        // 2. ADD THIS NEW METHOD (Load Patients)
+        private void LoadPatientsFromDatabase()
+        {
+            PatientComboBox.Items.Clear();
+            using (var db = new AppDbContext())
             {
-                // For new appointments: generate times based on the first dentist in the list
-                if (DentistBox.Items.Count > 0)
+                foreach (var patient in db.Patients.OrderBy(p => p.Name).ToList())
                 {
-                    DentistBox.SelectedIndex = 0;
-                    // DentistBox_SelectionChanged will fire and populate times + services
+                    PatientComboBox.Items.Add(patient.Name);
                 }
             }
+            if (PatientComboBox.Items.Count > 0)
+                PatientComboBox.SelectedIndex = 0;
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -249,14 +276,21 @@ namespace Dental_Clinic_System.Dashboard
         // ─────────────────────────────────────────────────────────────
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            // Step 1: Patient name
-            if (string.IsNullOrWhiteSpace(PatientNameBox.Text) || PatientNameBox.Text == "Enter patient name")
+            // Step 1: Patient name (Get from ComboBox or TextBox)
+            string patientName = "";
+            if (PatientComboBox.Visibility == Visibility.Visible)
+                patientName = PatientComboBox.SelectedItem?.ToString()?.Trim() ?? "";
+            else
+                patientName = PatientNameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(patientName))
             {
                 ShowValidationError(
                     "Step 1 of 5 — Patient Name Missing",
-                    "Please enter the patient's full name before saving.\n\n" +
-                    "→ Click the 'PATIENT NAME' field and type the patient's name.");
-                PatientNameBox.Focus();
+                    "Please select or enter the patient's full name.");
+
+                if (PatientComboBox.Visibility == Visibility.Visible) PatientComboBox.Focus();
+                else PatientNameBox.Focus();
                 return;
             }
 
@@ -309,7 +343,7 @@ namespace Dental_Clinic_System.Dashboard
 
             try
             {
-                string patientName = PatientNameBox.Text.Trim();
+                
                 string dentist = GetRealDentistName(DentistBox.SelectedItem.ToString());
                 string date = DateBox.SelectedDate.Value.ToString("yyyy-MM-dd");
                 string time = TimeBox.SelectedItem.ToString();
