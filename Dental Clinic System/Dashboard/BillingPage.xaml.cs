@@ -49,9 +49,11 @@ namespace Dental_Clinic_System.Dashboard
 
         private void ViewReceipt_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService != null)
+            // Get the exact row where the "View" button was clicked
+            if (sender is Button btn && btn.DataContext is BillingItem billing)
             {
-                NavigationService.Navigate(new ReceiptPage());
+                // Pass the billing data to the ReceiptPage
+                NavigationService?.Navigate(new ReceiptPage(billing));
             }
         }
 

@@ -9,7 +9,6 @@
     Background="#F5F6F8">
 
     <Grid Margin="25">
-        <!-- FIXED: Removed extra ColumnDefinitions to prevent squishing -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Header -->
@@ -22,7 +21,6 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <!-- FIXED: Removed RowSpan and weird Margins -->
         <Grid Grid.Row="0" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -66,10 +64,9 @@
         </Grid>
 
         <!-- Summary Cards -->
-        <!-- FIXED: Removed RowSpan so it stays inside its own row -->
         <UniformGrid Grid.Row="1"
                      Columns="4"
-                     Margin="0,0,0,0">
+                     Margin="0,20,0,0">
 
             <!-- Card 1 - Total Revenue -->
             <Border Background="White"
@@ -167,34 +164,41 @@
                            FontWeight="SemiBold"
                            Margin="25,20,0,20"/>
 
-                <!-- FIXED: Gikuha ang ScrollViewer, gibutang ang scrolling sa DataGrid mismo -->
+                <!-- OPTIMIZED DATAGRID -->
                 <DataGrid Grid.Row="1"
                           x:Name="BillingDataGrid"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"
                           GridLinesVisibility="None"
                           BorderThickness="0"
-                          RowHeight="60"
-                          FontSize="15"
+                          RowHeight="55"
+                          FontSize="13"
                           CanUserAddRows="False"
                           IsReadOnly="True"
-                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                     <DataGrid.Columns>
 
                         <DataGridTextColumn Header="INVOICE NO."
                                             Binding="{Binding InvoiceNo}"
-                                            Width="150"/>
+                                            Width="120"/>
 
                         <DataGridTextColumn Header="PATIENT"
                                             Binding="{Binding Patient}"
-                                            Width="180"/>
+                                            Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip" Value="{Binding Patient}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
-                        <!-- FIXED: Gihatagan og fixed width (250) kay ang * mo-squish pag walay ScrollViewer -->
+                        <!-- SERVICES COLUMN: Width="*" mo-mean nga mo-fill siya sa remaining space -->
                         <DataGridTextColumn Header="SERVICES"
                                             Binding="{Binding Service}"
-                                            Width="250">
+                                            Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -205,14 +209,14 @@
 
                         <DataGridTextColumn Header="AMOUNT"
                                             Binding="{Binding Amount, StringFormat='₱{0:F2}'}"
-                                            Width="110"/>
+                                            Width="90"/>
 
                         <!-- TOGGLABLE STATUS BUTTON COLUMN -->
-                        <DataGridTemplateColumn Header="STATUS" Width="120">
+                        <DataGridTemplateColumn Header="STATUS" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="{Binding Status}" Padding="8,4" BorderThickness="0" Cursor="Hand" 
-                                            FontWeight="SemiBold" FontSize="12" Click="ToggleStatus_Click">
+                                    <Button Content="{Binding Status}" Padding="6,3" BorderThickness="0" Cursor="Hand" 
+                                            FontWeight="SemiBold" FontSize="11" Click="ToggleStatus_Click">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Background" Value="#FEE2E2"/>
@@ -236,35 +240,32 @@
 
                         <DataGridTextColumn Header="DATE"
                                             Binding="{Binding Date}"
-                                            Width="120"/>
+                                            Width="100"/>
 
-                        <DataGridTextColumn Header="PAYMENT METHOD"
+                        <DataGridTextColumn Header="PAYMENT"
                                             Binding="{Binding PaymentMethod}"
-                                            Width="130"/>
+                                            Width="100"/>
 
-                        <!-- Actions Column -->
-                        <DataGridTemplateColumn Header="ACTIONS" Width="130">
+                        <!-- ACTIONS COLUMN: View & Delete Buttons -->
+                        <DataGridTemplateColumn Header="ACTIONS" Width="110">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Content="View"
-                                                Width="50" Height="30"
+                                                Width="45" Height="28"
                                                 Background="#0F766E" Foreground="White"
                                                 BorderThickness="0" Cursor="Hand"
                                                 Click="ViewReceipt_Click"
-                                                Margin="0,0,5,0"/>
+                                                Margin="0,0,3,0" FontSize="11"/>
 
                                         <Button Content="Delete"
-                                                Width="50" Height="30"
+                                                Width="45" Height="28"
                                                 Background="#DC2626" Foreground="White"
                                                 BorderThickness="0" Cursor="Hand"
-                                                Click="DeleteBilling_Click"/>
+                                                Click="DeleteBilling_Click" FontSize="11"/>
                                     </StackPanel>
-                                    
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-                            
                         </DataGridTemplateColumn>
 
                     </DataGrid.Columns>
