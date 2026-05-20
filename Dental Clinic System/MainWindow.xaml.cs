@@ -175,6 +175,10 @@ namespace Dental_Clinic_System
             LoginGrid.Visibility = Visibility.Visible;
         }
 
+        private void UsernameBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
     

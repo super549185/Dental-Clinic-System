@@ -17,7 +17,7 @@ namespace Dental_Clinic_System.Dashboard
         {
             InitializeComponent();
             _dbContext = new AppDbContext();
-            _dbContext.Database.EnsureCreated();
+            _dbContext.Database.EnsureCreated(); // EnsureDeleted is already removed
             LoadBillingData();
         }
 
@@ -83,6 +83,42 @@ namespace Dental_Clinic_System.Dashboard
                     {
                         MessageBox.Show($"Error deleting invoice: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                }
+            }
+        }
+
+        private void NewInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new AddInvoicePage());
+        }
+
+        private void ToggleStatus_Click(object sender, RoutedEventArgs e)
+        {
+            // Get the specific billing item that was clicked
+            if (sender is Button btn && btn.DataContext is BillingItem billing)
+            {
+                // Toggle the status
+                if (billing.Status == "Paid")
+                {
+                    billing.Status = "Pending";
+                }
+                else
+                {
+                    billing.Status = "Paid"; // Changes both "Pending" and "Partial" to "Paid"
+                }
+
+                try
+                {
+                    // Save changes to database
+                    _dbContext.Billings.Update(billing);
+                    _dbContext.SaveChanges();
+
+                    // Refresh the table and the summary cards at the top
+                    LoadBillingData();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error updating status: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

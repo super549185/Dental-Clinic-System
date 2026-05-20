@@ -7,8 +7,9 @@ namespace Dental_Clinic_System.Models
         [Key]
         public string InvoiceNo { get; set; }
         public string Patient { get; set; }
+        public string Service { get; set; }
         public decimal Amount { get; set; }
-        public string PaymentStatus { get; set; }
+        public string PaymentStatus { get; set; } = string.Empty;
         public string Status { get; set; }
         public string Date { get; set; }
         public string PaymentMethod { get; set; }

@@ -63,15 +63,15 @@
                     <DockPanel Margin="0 0 0 10" Background="#EFEFEF">
                         <TextBox x:Name="UsernameBox"
                               KeyDown="Input_KeyDown"
-                              Height="35" Width="314" Padding="10"
+                              Height="35" Width="249" Padding="10"
                               Background="#EFEFEF" BorderThickness="0"
                               Text="Username"
                               Foreground="Gray"
                               VerticalContentAlignment="Center"
                               GotFocus="UsernameBox_GotFocus"
-                              LostFocus="UsernameBox_LostFocus"/>
+                              LostFocus="UsernameBox_LostFocus" TextChanged="UsernameBox_TextChanged"/>
                          <Image Source="/Images/user.png"      
-                            DockPanel.Dock="Right" Width="100" /> 
+                            DockPanel.Dock="Right" Width="15" /> 
                     </DockPanel>
 
                     <!-- Password Box -->

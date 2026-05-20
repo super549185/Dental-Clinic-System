@@ -1,0 +1,89 @@
+﻿<Page x:Class="Dental_Clinic_System.Dashboard.AddInvoicePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#F9FAFB" Width="650" Height="600">
+
+    <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" 
+            Margin="30" Padding="30" VerticalAlignment="Center">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,25">
+                <TextBlock Text="Create New Invoice" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
+                <TextBlock Text="Select a patient and add multiple services." FontSize="13" Foreground="#9CA3AF" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Patient Dropdown -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,15">
+                <TextBlock Text="Patient (Today's Appointment)" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
+                <ComboBox x:Name="CmbPatient" FontSize="14" Padding="8" BorderBrush="#D1D5DB" Height="35"/>
+            </StackPanel>
+
+            <!-- Services Header with PLUS Button -->
+            <Grid Grid.Row="2" Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Services / Procedures" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="14" 
+                        Background="#E5E7EB" Foreground="#111827" BorderThickness="0" Cursor="Hand" 
+                        Padding="8,4" FontWeight="Bold" Click="AddServiceRow_Click"/>
+            </Grid>
+
+            <!-- Dynamic Services Container -->
+            <Border Grid.Row="3" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6" Padding="10" Background="#F9FAFB" Margin="0,0,0,15">
+                <StackPanel x:Name="ServicesPanel"/>
+            </Border>
+
+            <!-- Amount, Payment Method, & Status -->
+            <Grid Grid.Row="4" Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Total Amount (₱)" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
+                    <TextBox x:Name="TxtAmount" IsReadOnly="True" Background="#F3F4F6" Padding="8" FontSize="14" BorderBrush="#D1D5DB" Height="35" Text="0.00"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Payment Method" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="CmbPaymentMethod" FontSize="14" Padding="8" BorderBrush="#D1D5DB" Height="35">
+                        <ComboBoxItem Content="Cash" IsSelected="True"/>
+                        <ComboBoxItem Content="GCash"/>
+                        <ComboBoxItem Content="Card"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Status" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="CmbStatus" FontSize="14" Padding="8" BorderBrush="#D1D5DB" Height="35">
+                        <ComboBoxItem Content="Paid" IsSelected="True"/>
+                        <ComboBoxItem Content="Pending"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Footer Buttons -->
+            <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="Cancel" Background="White" Foreground="#374151" BorderBrush="#D1D5DB" BorderThickness="1" 
+                        Padding="20,10" FontSize="14" Cursor="Hand" Margin="0,0,10,0" Click="Cancel_Click"/>
+                <Button Content="Save Invoice" Background="#0F766E" Foreground="White" BorderThickness="0" 
+                        Padding="20,10" FontSize="14" FontWeight="SemiBold" Cursor="Hand" Click="SaveInvoice_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Page>

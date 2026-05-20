@@ -9,30 +9,67 @@
     Background="#F5F6F8">
 
     <Grid Margin="25">
+        <!-- FIXED: Removed extra ColumnDefinitions to prevent squishing -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="120"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Summary Cards -->
             <RowDefinition Height="20"/>
+            <!-- Spacer -->
             <RowDefinition Height="*"/>
+            <!-- Table -->
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel>
-            <TextBlock Text="Billing"
-                       FontSize="32"
-                       FontWeight="Bold"
-                       Foreground="#1E293B"/>
+        <!-- FIXED: Removed RowSpan and weird Margins -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Manage invoices and payments"
-                       FontSize="15"
-                       Foreground="#64748B"
-                       Margin="0,5,0,0"/>
-        </StackPanel>
+            <!-- Left Side: Title -->
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Billing"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+
+                <TextBlock Text="Manage invoices and payments"
+                           FontSize="15"
+                           Foreground="#64748B"
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Right Side: New Invoice Button -->
+            <Button Grid.Column="1" Content="New Invoice" Background="#0F766E" Foreground="White" 
+                    BorderThickness="0" Padding="15,10" FontSize="14" FontWeight="SemiBold" Cursor="Hand"
+                    VerticalAlignment="Center" Click="NewInvoice_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="16" 
+                                           VerticalAlignment="Center" Margin="0,0,8,0" Foreground="White"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#0D6560"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
 
         <!-- Summary Cards -->
+        <!-- FIXED: Removed RowSpan so it stays inside its own row -->
         <UniformGrid Grid.Row="1"
                      Columns="4"
-                     Margin="0,20,0,0">
+                     Margin="0,0,0,0">
 
             <!-- Card 1 - Total Revenue -->
             <Border Background="White"
@@ -49,8 +86,7 @@
                                Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
-                               Foreground="#0F766E"
-                               />
+                               Foreground="#0F766E"/>
                 </StackPanel>
             </Border>
 
@@ -69,8 +105,7 @@
                                Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
-                               Foreground="#16A34A"
-                               />
+                               Foreground="#16A34A"/>
                 </StackPanel>
             </Border>
 
@@ -89,8 +124,7 @@
                                Text=" ₱0.00"
                                FontSize="30"
                                FontWeight="Bold"
-                               Foreground="#DC2626"
-                               />
+                               Foreground="#DC2626"/>
                 </StackPanel>
             </Border>
 
@@ -108,8 +142,7 @@
                                Text="0"
                                FontSize="30"
                                FontWeight="Bold"
-                               Foreground="#0F766E"
-                               />
+                               Foreground="#0F766E"/>
                 </StackPanel>
             </Border>
         </UniformGrid>
@@ -122,21 +155,31 @@
                 BorderThickness="1"
                 Margin="0,10,0,0">
 
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <TextBlock Text="Recent Invoices"
+                <!-- Fixed Title -->
+                <TextBlock Grid.Row="0" Text="Recent Invoices"
                            FontSize="24"
                            FontWeight="SemiBold"
                            Margin="25,20,0,20"/>
 
-                <DataGrid x:Name="BillingDataGrid"
+                <!-- FIXED: Gikuha ang ScrollViewer, gibutang ang scrolling sa DataGrid mismo -->
+                <DataGrid Grid.Row="1"
+                          x:Name="BillingDataGrid"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"
                           GridLinesVisibility="None"
                           BorderThickness="0"
                           RowHeight="60"
                           FontSize="15"
-                          CanUserAddRows="False">
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                     <DataGrid.Columns>
 
@@ -146,63 +189,93 @@
 
                         <DataGridTextColumn Header="PATIENT"
                                             Binding="{Binding Patient}"
-                                            Width="200"/>
+                                            Width="180"/>
+
+                        <!-- FIXED: Gihatagan og fixed width (250) kay ang * mo-squish pag walay ScrollViewer -->
+                        <DataGridTextColumn Header="SERVICES"
+                                            Binding="{Binding Service}"
+                                            Width="250">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip" Value="{Binding Service}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTextColumn Header="AMOUNT"
-                                            Binding="{Binding Amount, StringFormat=C}"
-                                            Width="120"/>
+                                            Binding="{Binding Amount, StringFormat='₱{0:F2}'}"
+                                            Width="110"/>
 
-                        <DataGridTextColumn Header="STATUS"
-                                            Binding="{Binding Status}"
-                                            Width="140"/>
+                        <!-- TOGGLABLE STATUS BUTTON COLUMN -->
+                        <DataGridTemplateColumn Header="STATUS" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding Status}" Padding="8,4" BorderThickness="0" Cursor="Hand" 
+                                            FontWeight="SemiBold" FontSize="12" Click="ToggleStatus_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="#FEE2E2"/>
+                                                <Setter Property="Foreground" Value="#991B1B"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Paid">
+                                                        <Setter Property="Background" Value="#D1FAE5"/>
+                                                        <Setter Property="Foreground" Value="#065F46"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Partial">
+                                                        <Setter Property="Background" Value="#FEF3C7"/>
+                                                        <Setter Property="Foreground" Value="#92400E"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="DATE"
                                             Binding="{Binding Date}"
-                                            Width="160"/>
+                                            Width="120"/>
 
                         <DataGridTextColumn Header="PAYMENT METHOD"
                                             Binding="{Binding PaymentMethod}"
-                                            Width="150"/>
+                                            Width="130"/>
 
                         <!-- Actions Column -->
-                        <DataGridTemplateColumn Header="ACTIONS"
-                                                Width="120">
-
+                        <DataGridTemplateColumn Header="ACTIONS" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-
+                                    
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Content="View"
-                                                Width="50"
-                                                Height="30"
-                                                Background="#0F766E"
-                                                Foreground="White"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
+                                                Width="50" Height="30"
+                                                Background="#0F766E" Foreground="White"
+                                                BorderThickness="0" Cursor="Hand"
                                                 Click="ViewReceipt_Click"
                                                 Margin="0,0,5,0"/>
 
                                         <Button Content="Delete"
-                                                Width="50"
-                                                Height="30"
-                                                Background="#DC2626"
-                                                Foreground="White"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
+                                                Width="50" Height="30"
+                                                Background="#DC2626" Foreground="White"
+                                                BorderThickness="0" Cursor="Hand"
                                                 Click="DeleteBilling_Click"/>
                                     </StackPanel>
-
+                                    
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
-
+                            
                         </DataGridTemplateColumn>
 
                     </DataGrid.Columns>
 
                 </DataGrid>
 
-            </StackPanel>
-
+                <!-- Empty State Message -->
+                <TextBlock x:Name="EmptyBillingState" Grid.Row="1" Text="No invoices recorded yet. Click '+ New Invoice' to start."
+                           FontSize="15" Foreground="#9CA3AF" HorizontalAlignment="Center" 
+                           VerticalAlignment="Center" Margin="0,50,0,0" Visibility="Collapsed"/>
+            </Grid>
         </Border>
     </Grid>
 </Page>

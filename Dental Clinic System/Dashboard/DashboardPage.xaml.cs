@@ -20,6 +20,7 @@ namespace Dental_Clinic_System.Dashboard
             LoadTodayData();
             LoadDentistsOnDuty();
             LoadBillingStats();
+            LoadTotalPatients();
         }
 
         private void LoadTodayData()
@@ -30,7 +31,13 @@ namespace Dental_Clinic_System.Dashboard
                 .Where(a => a.Date == todayStr)
                 .ToList();
 
-            StatAppointments.Text = todayApts.Count.ToString();
+            // Count UNIQUE patients instead of total appointments
+            int uniquePatientCount = todayApts
+                .Select(a => a.PatientName)
+                .Distinct()
+                .Count();
+
+            StatAppointments.Text = uniquePatientCount.ToString();
 
             TodayAppointmentsList.Children.Clear();
 
@@ -114,17 +121,26 @@ namespace Dental_Clinic_System.Dashboard
         {
             try
             {
-                var billings = _dbContext.Billings.ToList();
-                decimal totalBilled = billings.Sum(b => b.Amount);
-                decimal totalPaid = billings.Where(b => b.PaymentStatus == "Paid").Sum(b => b.Amount);
-                int pendingCount = billings.Count(b => b.PaymentStatus == "Pending" || b.PaymentStatus == "Partial");
+                // Check if your BillingItem.Date is a DateTime or a String
+                // If it's a string (like "2023-10-25"), use this:
+                string todayStr = DateTime.Today.ToString("yyyy-MM-dd");
+                var todayPaidBillings = _dbContext.Billings
+                    .Where(b => b.Date == todayStr && b.Status == "Paid")
+                    .ToList();
 
-                // Add billing stats to dashboard (if you have UI elements for these)
-                // This could update TextBlocks or other UI elements
+                // NOTE: If your Date property is an actual DateTime object, use this instead:
+                // var todayPaidBillings = _dbContext.Billings
+                //     .Where(b => b.Date.Date == DateTime.Today && b.Status == "Paid")
+                //     .ToList();
+
+                decimal todayIncome = todayPaidBillings.Sum(b => b.Amount);
+
+                // Format with peso sign and 2 decimal places (e.g., ₱4,850.00)
+                StatIncomeToday.Text = $"₱{todayIncome:N2}";
             }
             catch (Exception ex)
             {
-                // Log error
+                StatIncomeToday.Text = "₱0.00";
                 System.Diagnostics.Debug.WriteLine($"Error loading billing stats: {ex.Message}");
             }
         }
@@ -218,6 +234,15 @@ namespace Dental_Clinic_System.Dashboard
                 return new SolidColorBrush(Color.FromRgb(r, g, b));
             }
             catch { return Brushes.Black; }
+        }
+
+        private void LoadTotalPatients()
+        {
+            int totalPatients = _dbContext.Patients.Count();
+
+            // Update the TextBlock - use whatever your XAML control is named
+            // Common names: StatPatients, TotalPatientsText, PatientsCount
+            StatPatients.Text = totalPatients.ToString();
         }
     }
 }
